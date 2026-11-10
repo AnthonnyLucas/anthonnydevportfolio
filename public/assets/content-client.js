@@ -32,6 +32,24 @@ export function applyContent(content = contentDefaults, root = document) {
   }}
   const contact = root.querySelector('#public-contact-email');
   if (contact && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.contactEmail)) contact.href=`mailto:${values.contactEmail}`;
+  // A sidebar utiliza o mesmo e-mail público configurável no painel.
+  const sidebarMail=root.querySelector('#sidebar-gmail');
+  if (sidebarMail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.contactEmail)) {
+    sidebarMail.href=`mailto:${values.contactEmail}`;
+  }
+  // Sem número real cadastrado, o ícone permanece visível, porém não é um link falso.
+  const whatsapp=root.querySelector('#sidebar-whatsapp');
+  if (whatsapp) {
+    let validWhatsapp=false;
+    try {
+      const parsed=new URL(values.whatsappUrl);
+      validWhatsapp=parsed.protocol==='https:' && ['wa.me','api.whatsapp.com','web.whatsapp.com'].includes(parsed.hostname.toLowerCase()) &&
+        (parsed.hostname.toLowerCase() !== 'wa.me' || /^\/\d{10,15}\/?$/.test(parsed.pathname));
+    } catch { /* Nenhum link cadastrado. */ }
+    whatsapp.classList.toggle('sidebar-social-icon-pending',!validWhatsapp);
+    if(validWhatsapp){whatsapp.href=values.whatsappUrl;whatsapp.target='_blank';whatsapp.rel='noopener noreferrer';whatsapp.removeAttribute('aria-disabled');whatsapp.setAttribute('aria-label','Conversar pelo WhatsApp');whatsapp.title='WhatsApp';}
+    else{whatsapp.removeAttribute('href');whatsapp.removeAttribute('target');whatsapp.removeAttribute('rel');whatsapp.setAttribute('aria-disabled','true');whatsapp.setAttribute('aria-label','WhatsApp (configure o número no painel)');whatsapp.title='Configure o link do WhatsApp no painel';}
+  }
   const portrait = values.aboutImage;
   if (portrait && (/^https:\/\//i.test(portrait) || /^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(portrait))) {
     root.querySelectorAll('[data-portrait]').forEach(img => {

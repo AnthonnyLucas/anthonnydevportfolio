@@ -1,10 +1,12 @@
+> **Versão 5.6 — Navegação em vidro e ícones de contato:** os três carrosséis públicos agora têm setas translúcidas centralizadas nas bordas laterais. Os contadores permanecem abaixo dos cartões. A sidebar inclui Gmail (usa o e-mail de contato do CMS) e WhatsApp (ative informando um link seguro do tipo `https://wa.me/55DDDNUMERO` em **Painel → Páginas & textos → Conteúdo geral**). Enquanto não houver número configurado, o ícone do WhatsApp aparece desativado. Leia `ALTERACOES_V5_6_VITRINES_CONTATO.md`.
+
 > **Atualização v5.1 — Aba Tecnologias:** leia `ALTERACOES_V5_1_TECNOLOGIAS.md` para detalhes de correções, testes e novas categorias. Os SVGs de marcas locais têm seus créditos em `ICONES_CREDITOS.md`.
 
 > **Atualização v5.0:** consulte [ALTERACOES_V5.md](ALTERACOES_V5.md) para catálogo de projetos, categorias múltiplas, listas pesquisáveis, ícones e sidebar editável. As mudanças da versão anterior estão em [ALTERACOES_V4.md](ALTERACOES_V4.md).
 
 # Portfólio profissional — preparado para Netlify
 
-Versão 5.0, construída a partir do projeto atualizado `ProjetoP.rar` (HTML/CSS/JavaScript). O nome do site continua sendo **Portfólio**. Mantém a identidade profissional e adiciona uma interface responsiva com animações, carrossel tridimensional de tecnologias com filtros, vitrine horizontal de projetos com dois cartões, categorias dinâmicas e múltiplas, vitrine de 18 formações com filtros e imagens, sidebar com acabamento de vidro e gerenciamento de todo o conteúdo pelo painel administrativo. As listas de projetos, tecnologias e formações possuem busca, filtro, rolagem interna e visualização completa sem alongar a página.
+Base inicial v5.0, atualizada nesta entrega para v5.6, construída a partir do projeto atualizado `ProjetoP.rar` (HTML/CSS/JavaScript). O nome do site continua sendo **Portfólio**. Mantém a identidade profissional e adiciona uma interface responsiva com animações, carrossel tridimensional de tecnologias com filtros, vitrine horizontal de projetos com dois cartões, categorias dinâmicas e múltiplas, vitrine de 18 formações com filtros e imagens, sidebar com acabamento de vidro e gerenciamento de todo o conteúdo pelo painel administrativo. As listas de projetos, tecnologias e formações possuem busca, filtro, rolagem interna e visualização completa sem alongar a página.
 
 ## Estrutura
 

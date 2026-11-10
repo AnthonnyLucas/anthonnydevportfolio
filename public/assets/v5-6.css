@@ -1,0 +1,42 @@
+/* v5.6 — Vitrines: setas laterais de vidro, sem alterar a lógica dos carrosséis. */
+.tech-carousel-shell,.project-viewport-wrap,.cert-viewport-wrap{position:relative;isolation:isolate;min-width:0}
+/* Controles ficam no centro vertical da vitrine, não na faixa do contador. */
+.glass-carousel-nav{position:absolute;z-index:25;left:-12px;right:-12px;top:50%;transform:translateY(-50%);display:flex;justify-content:space-between;align-items:center;gap:16px;pointer-events:none}
+.tech-carousel-navigation{top:187.5px}
+.glass-carousel-nav .glass-nav-button,
+.glass-carousel-nav .tech-arrow,
+.project-nav .glass-nav-button,
+.cert-nav .glass-nav-button{
+  --glass-border:color-mix(in srgb,var(--text) 25%,transparent);
+  flex:0 0 auto;display:grid;place-items:center;width:53px;height:68px;padding:0;
+  border:1px solid var(--glass-border);border-radius:18px;
+  background:linear-gradient(150deg,rgba(255,255,255,.16),rgba(255,255,255,.035) 45%,rgba(255,255,255,.09));
+  -webkit-backdrop-filter:blur(15px) saturate(125%);backdrop-filter:blur(15px) saturate(125%);
+  color:var(--text);box-shadow:0 12px 35px #0005,inset 0 1px rgba(255,255,255,.2);
+  cursor:pointer;pointer-events:auto;
+  transition:transform .22s ease,background .22s ease,border-color .22s ease,box-shadow .22s ease,color .22s ease;
+}
+.glass-carousel-nav .glass-nav-button svg{width:29px;height:29px;stroke:currentColor;filter:drop-shadow(0 1px 3px rgba(0,0,0,.35))}
+.glass-carousel-nav .glass-nav-button:hover:not(:disabled),
+.glass-carousel-nav .glass-nav-button:focus-visible{
+  transform:translateY(-2px) scale(1.035);color:var(--text);
+  border-color:color-mix(in srgb,var(--green) 66%,var(--text));
+  background:linear-gradient(135deg,color-mix(in srgb,var(--green) 19%,var(--panel)),color-mix(in srgb,var(--panel) 66%,transparent));
+  box-shadow:0 16px 38px #0005,0 0 24px color-mix(in srgb,var(--green) 14%,transparent),inset 0 1px #fff4;
+}
+.glass-carousel-nav .glass-nav-button:focus-visible{outline:2px solid var(--green);outline-offset:4px}
+.glass-carousel-nav .glass-nav-button:disabled{opacity:.26;cursor:not-allowed;transform:none;box-shadow:none}
+/* O contador permanece acessível e centralizado abaixo dos cartões. */
+.tech-carousel-controls{margin-top:19px;justify-content:center}
+.project-showcase-controls,.cert-showcase-controls{justify-content:center;margin-top:12px;padding:6px 0 0}
+/* Visual coerente com sidebar existente, sem imagens externas. */
+.sidebar-social-links{gap:7px;flex-wrap:wrap}
+.sidebar-social-icon{width:43px;height:43px;background:color-mix(in srgb,var(--panel) 55%,transparent);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.sidebar-social-icon svg{width:20px;height:20px}
+.sidebar-social-icon-pending{opacity:.45;cursor:default;filter:saturate(.4)}
+.sidebar-social-icon-pending:hover{transform:none;color:var(--muted);border-color:var(--line);background:color-mix(in srgb,var(--panel) 55%,transparent)}
+html[data-theme=light] .glass-carousel-nav .glass-nav-button{background:rgba(255,255,255,.7);border-color:#60718b77;color:#1c2d44;box-shadow:0 10px 28px #192c4d27,inset 0 1px #fff}
+@media(max-width:900px){.glass-carousel-nav{left:-6px;right:-6px}.glass-carousel-nav .glass-nav-button{width:46px;height:60px;border-radius:15px}.glass-carousel-nav .glass-nav-button svg{width:25px;height:25px}}
+@media(max-width:500px){.glass-carousel-nav{left:-4px;right:-4px}.glass-carousel-nav .glass-nav-button{width:40px;height:53px;border-radius:13px}.glass-carousel-nav .glass-nav-button svg{width:24px;height:24px}.tech-carousel-navigation{top:162.5px}.sidebar-social-links{gap:6px}}
+@media(min-width:501px) and (max-width:750px){.tech-carousel-navigation{top:175px}}
+@media(prefers-reduced-motion:reduce){.glass-carousel-nav .glass-nav-button{transition:none}}

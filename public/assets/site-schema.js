@@ -93,6 +93,7 @@ export const contentFields = [
   field('footerVersion','geral','Rodapé – identificação','PORTFOLIO / NETLIFY'),
   field('githubUrl','geral','Perfil GitHub','https://github.com/AnthonnyLucas','url',800),
   field('linkedinUrl','geral','Perfil LinkedIn','https://www.linkedin.com/in/anthonny-lucas-a55596310/','url',800),
+  field('whatsappUrl','geral','WhatsApp – link (ex.: https://wa.me/55DDDNUMERO)','','url',800),
   field('metaTitle','geral','Título da aba','Anthonny Lucas — Full Stack · IoT · IA'),
   field('metaDescription','geral','Descrição para mecanismos de busca','Portfólio de Anthonny Lucas — desenvolvimento Full Stack, Inteligência Artificial, Internet das Coisas e inovação.','textarea',450)
 ];

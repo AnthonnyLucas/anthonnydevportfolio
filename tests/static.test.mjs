@@ -54,3 +54,21 @@ test('v5.2: Ver todas as tecnologias expande somente a lista e preserva a altura
   assert.match(js,/setAttribute\('aria-expanded',String\(expanded\)\)/);
   assert.match(html,/id="tech-show-all"[^>]+aria-controls="admin-tech-list"/);
 });
+
+
+test('v5.6 uses floating side navigation across all showcases and editable sidebar contacts', async()=>{
+ const html=read('public/index.html');
+ const css=read('public/assets/v5-6.css');
+ const schema=await import('../public/assets/site-schema.js');
+ for(const id of ['tech-prev','tech-next','project-prev','project-next','cert-prev','cert-next','sidebar-gmail','sidebar-whatsapp']){
+  assert.ok(html.includes(`id="${id}"`),id);
+  assert.equal((html.match(new RegExp(`id="${id}"`,'g'))||[]).length,1);
+ }
+ for(const cls of ['tech-carousel-navigation glass-carousel-nav','project-nav glass-carousel-nav','cert-nav glass-carousel-nav'])assert.ok(html.includes(cls),cls);
+ for(const selector of ['.glass-carousel-nav','.glass-nav-button','.sidebar-social-icon-pending'])assert.ok(css.includes(selector),selector);
+ assert.equal(schema.contentDefaults.whatsappUrl,'');
+ assert.equal(schema.contentFields.find(f=>f.key==='whatsappUrl')?.group,'geral');
+ const client=read('public/assets/content-client.js');
+ assert.ok(client.includes("#sidebar-whatsapp"));
+ assert.ok(client.includes("#sidebar-gmail"));
+});
