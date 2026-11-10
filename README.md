@@ -1,15 +1,19 @@
+> **Mudanças desta versão:** consulte [ALTERACOES_V4.md](ALTERACOES_V4.md) para a lista de implementações, testes e orientações de uso.
+
 # Portfólio profissional — preparado para Netlify
 
-Versão 3.0, modernizada do projeto original `iLoveZIP.zip` (pasta `1.4`, HTML/CSS/JavaScript). O nome do site é **Portfólio**, e não iLoveZIP. Mantém a identidade profissional e adiciona uma interface responsiva com animações, carrossel tridimensional de tecnologias com filtros, galeria dinâmica, vitrine de 18 formações com filtros e imagens, e um painel administrativo discreto.
+Versão 4.0, construída a partir do projeto atualizado `ProjetoP.rar` (HTML/CSS/JavaScript). O nome do site continua sendo **Portfólio**. Mantém a identidade profissional e adiciona uma interface responsiva com animações, carrossel tridimensional de tecnologias com filtros, galeria dinâmica, vitrine de 18 formações com filtros e imagens, sidebar com acabamento de vidro e gerenciamento de todo o conteúdo pelo painel administrativo.
 
 ## Estrutura
 
 - `public/index.html`: site público, compatível com publicação estática.
-- `public/admin/index.html`: formulário de login e painel para administrar projetos e certificados.
+- `public/admin/index.html`: formulário de login e painel para editar textos, imagens, tecnologias, projetos e certificados.
 - `public/assets/`: CSS, JavaScript e recursos da interface. Inclui `tech-carousel.js`, `tech-carousel.css` e a pasta `tech-logos` com ícones SVG locais de reserva, além de `cert-carousel.js`, `cert-carousel.css` e imagens disponíveis dos certificados.
 - `netlify/functions/auth.mjs`: autenticação por e-mail e senha com cookie `HttpOnly` assinado.
 - `netlify/functions/projects.mjs`: listagem pública e inclusão/edição/exclusão autenticada de projetos.
 - `netlify/functions/certificates.mjs`: lista pública e edição autenticada das formações e de suas imagens.
+- `netlify/functions/content.mjs` e `netlify/functions/technologies.mjs`: CMS de seções e catálogo editável com escrita autenticada.
+- `public/assets/site-schema.js` e `public/assets/cms-admin.js`: campos permitidos e interface do editor.
 - `netlify/functions/media.mjs`: upload de imagens até 4 MB e entrega das imagens armazenadas.
 - `netlify/functions/lib/security.mjs`: validação e segurança.
 - `netlify.toml`: configurações da Netlify (publicação, funções, cabeçalhos de proteção).
@@ -25,7 +29,7 @@ Versão 3.0, modernizada do projeto original `iLoveZIP.zip` (pasta `1.4`, HTML/C
 5. Faça o primeiro deploy. O site público já funcionará; o painel mostrará que ainda faltam credenciais.
 6. Para ativar o painel, configure no site da Netlify, em **Project configuration → Environment variables**, as variáveis `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH` e `SESSION_SECRET`. Escolha escopo **Functions** ou **All** e ambiente **Production**; faça novo deploy após configurar.
 7. Gere valores seguros localmente, na raiz do projeto, com `node scripts/gerar-credenciais.mjs`. Este script pede o e-mail e a senha, produz o hash e um segredo; **não salva a senha em arquivos**. Para o acesso definido nesta conversa, use o e-mail `teste@gmail.com` e a senha escolhida anteriormente. O gerador aceita essa senha, mas alerta sobre sua fragilidade. **É altamente recomendado substituí-la por uma senha longa e exclusiva antes de tornar o painel público.** Nunca inclua senhas ou valores reais de configuração no repositório.
-8. Acesse `https://SEU-SITE.netlify.app/admin/` (ou clique no pequeno cadeado no rodapé do portfólio). Entre com o e-mail e senha definidos; nas abas **Projetos** e **Formações e certificados**, cadastre e edite as imagens, descrições, categorias e demais dados. O visitante verá as atualizações após recarregar o site.
+8. Acesse `https://SEU-SITE.netlify.app/admin/` (ou clique no pequeno cadeado no rodapé do portfólio). Entre com o e-mail e senha definidos; nas abas **Páginas & textos**, **Tecnologias**, **Projetos** e **Formações e certificados**, edite o conteúdo do portfólio. O visitante verá as atualizações após recarregar o site.
 9. Na aba **Forms** da Netlify, habilite **Form detection**, se necessário, e republique para ativar o formulário de contato. As mensagens aparecerão no painel de formulários da Netlify. Configure notificações, se desejar recebê-las por e-mail.
 
 **Importante:** upload por simples arrastar a pasta `public` no Netlify Drop é suficiente para visualizar o site, mas **não** instala nem publica as funções necessárias ao painel. Para o painel completo, use o deploy conectado ao Git ou o Netlify CLI. Os dados dos projetos, das formações e suas imagens ficam em `Netlify Blobs` site-wide, preservados entre deploys da mesma aplicação.
@@ -45,6 +49,7 @@ Verificações de sintaxe:
 
 ```bash
 npm run check
+npm run test
 ```
 
 ## Cuidados e funcionalidades

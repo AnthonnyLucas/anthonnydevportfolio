@@ -1,6 +1,7 @@
 import { showcaseProjects } from './data.js';
 import { setupCertificates } from './cert-carousel.js';
 import { setupTechCarousel } from './tech-carousel.js';
+import { loadSiteContent } from './content-client.js';
 
 const qs = (s, root = document) => root.querySelector(s);
 const qsa = (s, root = document) => [...root.querySelectorAll(s)];
@@ -49,7 +50,17 @@ const navObserver = new IntersectionObserver(entries => {
 }, { rootMargin: '-25% 0px -55% 0px', threshold: 0 });
 sections.forEach(section => navObserver.observe(section));
 
-setupTechCarousel();
+const techCarousel = setupTechCarousel();
+async function loadTechnologies() {
+  try {
+    const result = await fetch('/.netlify/functions/technologies', {cache:'no-store'});
+    if (!result.ok || !(result.headers.get('content-type')||'').includes('application/json')) return;
+    const body=await result.json();
+    if (Array.isArray(body.technologies)) techCarousel?.setSkills(body.technologies);
+  } catch { /* Mantém a vitrine original na prévia estática. */ }
+}
+loadTechnologies();
+loadSiteContent();
 
 setupCertificates();
 

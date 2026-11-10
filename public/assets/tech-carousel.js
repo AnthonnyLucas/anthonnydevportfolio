@@ -43,7 +43,9 @@ export function setupTechCarousel() {
   const live = document.querySelector('#tech-live');
   if (!stage || !track || !previous || !next) return;
 
-  let filteredSkills = [...skills];
+  let sourceSkills = [...skills];
+  let filteredSkills = [...sourceSkills];
+  let selectedFilter = 'all';
   let cards = [];
   let active = 0;
   let pointer = null;
@@ -59,6 +61,7 @@ export function setupTechCarousel() {
   function update(announce = true) {
     const n = filteredSkills.length;
     const windowSize = visibleWindow();
+    previous.disabled = next.disabled = n <= 1;
     cards.forEach((card, i) => {
       const d = distance(i, active, n);
       const visible = Math.abs(d) <= windowSize;
@@ -68,9 +71,9 @@ export function setupTechCarousel() {
       card.tabIndex = visible ? 0 : -1;
       card.style.pointerEvents = visible ? 'auto' : 'none';
     });
-    currentLabel.textContent = digits(active+1);
+    currentLabel.textContent = n ? digits(active+1) : '00';
     totalLabel.textContent = digits(n);
-    progress.style.width = `${((active+1)/n)*100}%`;
+    progress.style.width = `${n ? ((active+1)/n)*100 : 0}%`;
     const selected = filteredSkills[active];
     if (announce && selected) live.textContent = `${selected.label}, ${cats[selected.cat]}, ${active+1} de ${n}`;
   }
@@ -83,25 +86,29 @@ export function setupTechCarousel() {
   }
 
   function logoFor(skill) {
-    const wrap = document.createElement('span');
-    wrap.className = 'tech-logo-wrap';
-    const img = document.createElement('img');
-    img.className = 'tech-logo';
-    img.alt = '';
-    img.decoding = 'async';
-    img.draggable = false;
-    const slug = {'C++':'cpp', 'C#':'csharp'}[skill.label] || skill.label.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+    const wrap=document.createElement('span');
+    wrap.className='tech-logo-wrap';
+    const mark=brandMarks[skill.label];
+    const external = typeof skill.logoUrl === 'string' && (skill.logoUrl.startsWith('https://') || /^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(skill.logoUrl)) ? skill.logoUrl : '';
+    const slug = {'C++':'cpp','C#':'csharp'}[skill.label] || skill.label.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
     const fallback = `/assets/tech-logos/${slug}.svg`;
-    const mark = brandMarks[skill.label];
-    if (mark?.[0]) {
-      img.src = `https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${mark[0]}`;
-      img.addEventListener('error', () => {
-        if (img.src.endsWith(fallback)) return;
-        img.src = fallback;
-      }, {once:true});
-    } else img.src = fallback;
-    wrap.append(img);
-    return wrap;
+    if (!external && !mark) {
+      const glyph=document.createElement('span');
+      glyph.className='tech-logo-glyph';
+      glyph.textContent=String(skill.icon || skill.label.slice(0,2)).slice(0,12);
+      wrap.append(glyph);
+      return wrap;
+    }
+    const img=document.createElement('img');
+    img.className='tech-logo';img.alt='';img.decoding='async';img.draggable=false;
+    if (external) {
+      img.src=external;
+      img.addEventListener('error',()=>{const glyph=document.createElement('span');glyph.className='tech-logo-glyph';glyph.textContent=String(skill.icon||skill.label.slice(0,2)).slice(0,12);img.replaceWith(glyph);},{once:true});
+    } else if(mark?.[0]) {
+      img.src=`https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${mark[0]}`;
+      img.addEventListener('error',()=>{img.src=fallback;img.addEventListener('error',()=>{const glyph=document.createElement('span');glyph.className='tech-logo-glyph';glyph.textContent=String(skill.icon||skill.label.slice(0,2)).slice(0,12);img.replaceWith(glyph);},{once:true});},{once:true});
+    } else img.src=fallback;
+    wrap.append(img);return wrap;
   }
 
   function render() {
@@ -111,13 +118,13 @@ export function setupTechCarousel() {
       card.className = 'tech-slide';
       card.type='button';
       const mark = brandMarks[skill.label];
-      const color = mark?.[1] || '#B7FF79';
+      const color = /^#[0-9a-f]{6}$/i.test(skill.color||'') ? skill.color : (mark?.[1] || '#B7FF79');
       card.style.setProperty('--brand', color);
-      card.setAttribute('aria-label', `${skill.label}, ${cats[skill.cat]}. Exibir em destaque`);
+      card.setAttribute('aria-label', `${skill.label}, ${cats[skill.cat] || 'TECNOLOGIAS'}. Exibir em destaque`);
       const top = document.createElement('span');
       top.className = 'tech-slide-top';
       const category = document.createElement('span');
-      category.textContent = cats[skill.cat];
+      category.textContent = cats[skill.cat] || 'TECNOLOGIAS';
       const index = document.createElement('span');
       index.textContent = digits(i+1);
       top.append(category, index);
@@ -139,7 +146,7 @@ export function setupTechCarousel() {
       return card;
     });
     update(false);
-    live.textContent = `${filteredSkills[0].label}. 1 de ${filteredSkills.length} tecnologias`;
+    live.textContent = filteredSkills.length ? `${filteredSkills[0].label}. 1 de ${filteredSkills.length} tecnologias` : 'Sem tecnologias nesta categoria';
   }
 
   previous.addEventListener('click', () => jumpTo(active-1));
@@ -179,14 +186,24 @@ export function setupTechCarousel() {
   // Keep the currently filtered selection when possible; a new category starts with its first card.
   document.querySelectorAll('[data-stack]').forEach(button => button.addEventListener('click', () => {
     const filter = button.dataset.stack;
+    selectedFilter = filter;
     document.querySelectorAll('[data-stack]').forEach(peer => {
       const selected = peer === button;
       peer.classList.toggle('active', selected);
       peer.setAttribute('aria-pressed', String(selected));
     });
-    filteredSkills = skills.filter(item => filter==='all' || item.cat===filter);
+    filteredSkills = sourceSkills.filter(item => filter==='all' || item.cat===filter);
     active=0;
     render();
   }));
   render();
+  return {
+    setSkills(nextSkills) {
+      if (!Array.isArray(nextSkills)) return;
+      sourceSkills=nextSkills.filter(item=>item && typeof item.label==='string' && typeof item.cat==='string');
+      filteredSkills=sourceSkills.filter(item=>selectedFilter==='all' || item.cat===selectedFilter);
+      active=0;
+      render();
+    }
+  };
 }

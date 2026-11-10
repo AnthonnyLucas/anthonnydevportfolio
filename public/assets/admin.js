@@ -1,3 +1,4 @@
+import { setupCmsAdmin } from './cms-admin.js';
 const qs = selector => document.querySelector(selector);
 const state = { projects: [], certificates: [], imageUrl: '', pendingPreview: null, certImageUrl: '', certPendingPreview: null };
 const status = qs('#admin-status');
@@ -19,6 +20,7 @@ const request = async (url, options = {}) => {
   }
   return data;
 };
+const cmsAdmin = setupCmsAdmin({request,showStatus});
 const preview = url => {
   const area = qs('#image-preview');
   area.replaceChildren();
@@ -98,11 +100,12 @@ async function refresh() {
   state.certificates = certResult.certificates || [];
   renderList();
   renderCertList();
+  await cmsAdmin.refresh();
 }
 async function init() {
   try {
     const auth=await request('/.netlify/functions/auth');
-    if (auth.authenticated) {showDashboard();await refresh();showStatus('Acesso autorizado. Projetos e formações sincronizados.','success');}
+    if (auth.authenticated) {showDashboard();try {await refresh();showStatus('Acesso autorizado. Conteúdo, tecnologias, projetos e formações sincronizados.','success');} catch(error) {showStatus('Login válido, mas alguns dados não foram carregados: '+error.message,'error');}}
     else {showLogin(); showStatus(auth.configured ? 'Entre para gerenciar seu portfólio.' : 'O login ainda precisa ser configurado nas variáveis de ambiente da Netlify.',auth.configured ? '' : 'error');}
   } catch (error) {showLogin();showStatus(error.message || 'Não foi possível conectar às funções da Netlify. Para testar o painel, use npm run dev.','error');}
 }
@@ -115,7 +118,7 @@ qs('#login-form').addEventListener('submit', async e => {
   try {
     await request('/.netlify/functions/auth', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({ email: qs('#login-email').value, password:qs('#login-password').value })});
     qs('#login-password').value = '';
-    showDashboard();await refresh();showStatus('Login realizado. Você já pode gerenciar projetos e formações.','success');
+    showDashboard();try {await refresh();showStatus('Login realizado. Gerenciamento de todas as seções disponível.','success');} catch(error) {showStatus('Login realizado, mas não foi possível carregar alguns dados: '+error.message,'error');}
   } catch(err) {showStatus(err.message,'error');}
   finally {submit.disabled=false;}
 });
@@ -234,16 +237,17 @@ function renderCertList() {
   });
 }
 function selectTab(name) {
-  const isProject = name === 'projects';
-  qs('#projects-panel').hidden = !isProject;
-  qs('#certificates-panel').hidden = isProject;
-  for (const [tab,enabled] of [[qs('#tab-projects'),isProject],[qs('#tab-certificates'),!isProject]]) {
-    tab.classList.toggle('active',enabled);
-    tab.setAttribute('aria-selected',String(enabled));
+  const panels={content:'#content-panel',technologies:'#technologies-panel',projects:'#projects-panel',certificates:'#certificates-panel'};
+  for(const [key,selector] of Object.entries(panels)) {
+    qs(selector).hidden=key!==name;
+    const tab=qs(`#tab-${key}`);
+    tab.classList.toggle('active',key===name);
+    tab.setAttribute('aria-selected',String(key===name));
   }
 }
-qs('#tab-projects').addEventListener('click',()=>selectTab('projects'));
-qs('#tab-certificates').addEventListener('click',()=>selectTab('certificates'));
+for(const name of ['content','technologies','projects','certificates']) {
+  qs(`#tab-${name}`).addEventListener('click',()=>selectTab(name));
+}
 qs('#new-certificate').addEventListener('click',()=>{resetCertForm();certField('name').focus();qs('.cert-editor-card').scrollIntoView({behavior:'smooth',block:'start'});});
 qs('#clear-certificate').addEventListener('click',resetCertForm);
 certField('image').addEventListener('change',event=>{

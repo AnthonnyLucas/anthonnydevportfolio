@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 480" role="img" aria-label="Retrato de reserva">
+<defs><linearGradient id="bg" x2="1" y2="1"><stop stop-color="#1c3352"/><stop offset="1" stop-color="#111d31"/></linearGradient><linearGradient id="head" x2="1" y2="1"><stop stop-color="#a9c7df"/><stop offset="1" stop-color="#647a98"/></linearGradient></defs>
+<rect width="400" height="480" rx="25" fill="url(#bg)"/><circle cx="200" cy="135" r="95" fill="#7fdce0" fill-opacity=".07"/>
+<circle cx="200" cy="175" r="72" fill="url(#head)" opacity=".56"/>
+<path d="M75 455c0-104 55-168 125-168s125 64 125 168" fill="url(#head)" opacity=".45"/>
+<path d="M66 422Q200 380 333 422" fill="none" stroke="#b7ff79" stroke-opacity=".25" stroke-width="2"/>
+<text x="200" y="60" font-size="20" letter-spacing="6" text-anchor="middle" fill="#d5e4ee" font-family="system-ui">PERFIL</text>
+</svg>

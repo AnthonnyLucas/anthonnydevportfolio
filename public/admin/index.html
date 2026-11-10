@@ -6,10 +6,55 @@
     <div class="admin-top"><a href="/" class="brand"><span class="brand-mark">A<span>.</span></span><span class="brand-text">PORTFOLIO <small>ADMIN / RESTRICTED</small></span></a><a href="/" class="back-link">← Voltar ao site</a></div>
     <div id="admin-status" class="admin-status" role="status" aria-live="polite">Verificando acesso...</div>
     <section id="login-panel" class="login-card" hidden><div class="admin-eyebrow">ÁREA RESTRITA / AUTHENTICATION</div><h1>Acesso ao<br/><span class="gradient-text">painel.</span></h1><p>Entre com o e-mail e a senha administrativa configurados nas variáveis de ambiente da Netlify.</p><form id="login-form"><label for="login-email">E-mail</label><input type="email" id="login-email" name="email" autocomplete="username" required placeholder="seu-email@exemplo.com"/><label for="login-password">Senha</label><input type="password" id="login-password" name="password" autocomplete="current-password" required placeholder="Sua senha de acesso"/><button class="button button-primary" type="submit">Entrar no painel <span>↗</span></button></form><small>O login só funciona após configurar o ADMIN_EMAIL, ADMIN_PASSWORD_HASH e SESSION_SECRET na Netlify.</small></section>
-    <section id="dashboard" class="dashboard" hidden><div class="dashboard-header"><div><span class="admin-eyebrow">DASHBOARD / CONTEÚDO</span><h1>Gerenciar <span class="gradient-text">portfólio.</span></h1><p>Publique projetos, cursos e imagens diretamente pelo painel.</p></div><button id="logout-btn" class="button button-outline" type="button">Sair do painel ↗</button></div>
+    <section id="dashboard" class="dashboard" hidden><div class="dashboard-header"><div><span class="admin-eyebrow">DASHBOARD / CONTEÚDO</span><h1>Gerenciar <span class="gradient-text">portfólio.</span></h1><p>Atualize textos, fotografias, tecnologias, projetos e formações sem editar o código.</p></div><button id="logout-btn" class="button button-outline" type="button">Sair do painel ↗</button></div>
       <div class="admin-summary"><div><span>Projetos publicados</span><strong id="project-count">0</strong></div><div><span>Formações cadastradas</span><strong id="certificate-count">0</strong></div><div><span>Acesso</span><strong>Protegido</strong></div></div>
-      <nav class="admin-tabs" aria-label="Seções do painel"><button id="tab-projects" type="button" class="active" aria-selected="true">Projetos</button><button id="tab-certificates" type="button" aria-selected="false">Formações e certificados</button></nav>
-      <div id="projects-panel" class="dashboard-grid"><div class="admin-card admin-list"><div class="card-heading"><h2>Meus projetos</h2><button id="new-project" class="small-primary" type="button">+ Novo projeto</button></div><div id="admin-project-list" class="admin-project-list" aria-live="polite"></div></div>
+      <nav class="admin-tabs" aria-label="Seções do painel">
+        <button id="tab-content" type="button" class="active" aria-selected="true">Páginas &amp; textos</button>
+        <button id="tab-technologies" type="button" aria-selected="false">Tecnologias</button>
+        <button id="tab-projects" type="button" aria-selected="false">Projetos</button>
+        <button id="tab-certificates" type="button" aria-selected="false">Formações &amp; certificados</button>
+      </nav>
+      <div id="content-panel" class="dashboard-grid cms-panel">
+        <div class="admin-card cms-menu">
+          <div class="card-heading"><h2>Editar as páginas</h2><span class="mini-label">CMS / CONTEÚDO</span></div>
+          <p class="form-hint">Selecione a área. O site público recebe os textos salvos na Netlify automaticamente.</p>
+          <div id="content-group-buttons" class="cms-section-list" role="group" aria-label="Escolher seção para edição"></div>
+          <div id="content-live-preview" class="cms-live-preview" aria-live="polite"></div>
+        </div>
+        <div class="admin-card cms-editor-card">
+          <div class="card-heading"><h2 id="cms-editor-title">Início</h2><span class="mini-label">VISUALIZAR / SALVAR</span></div>
+          <p id="cms-editor-description" class="form-hint">Altere o conteúdo desejado.</p>
+          <form id="content-form">
+            <div id="content-fields" class="cms-fields"></div>
+            <div class="form-actions"><button id="save-content" class="button button-primary" type="submit">Salvar alterações ↗</button><button id="restore-content" class="button button-outline" type="button">Descartar edições</button><button id="defaults-content" class="button button-outline" type="button">Repor textos originais</button></div>
+            <p class="form-hint">Somente ao clicar em salvar o conteúdo será atualizado para os visitantes. Imagens devem ser públicas, sem dados sensíveis.</p>
+          </form>
+        </div>
+      </div>
+      <div id="technologies-panel" class="dashboard-grid" hidden>
+        <div class="admin-card admin-list">
+          <div class="card-heading"><h2>Minhas tecnologias</h2><button type="button" id="new-technology" class="small-primary">+ Nova tecnologia</button></div>
+          <p class="form-hint">Edite ou remova ferramentas. Use ↑ e ↓ para reorganizar a ordem da vitrine.</p>
+          <div id="admin-tech-list" class="admin-project-list" aria-live="polite"></div>
+        </div>
+        <div class="admin-card tech-editor-card">
+          <div class="card-heading"><h2 id="tech-editor-title">Nova tecnologia</h2><span class="mini-label">VITRINE / 3D</span></div>
+          <form id="technology-form">
+            <input type="hidden" id="technology-id" />
+            <label for="technology-name">Tecnologia ou ferramenta *</label><input id="technology-name" required maxlength="64" placeholder="Ex.: TypeScript" />
+            <label for="technology-category">Categoria *</label>
+            <select id="technology-category"><option value="linguagens">Linguagens</option><option value="frameworks">Frameworks</option><option value="infra">Infra &amp; DevOps</option><option value="iot">IoT &amp; Dados</option></select>
+            <label for="technology-icon">Símbolo de reserva</label><input id="technology-icon" maxlength="12" placeholder="Ex.: TS" />
+            <label for="technology-color">Cor de destaque</label><input id="technology-color" type="color" value="#b7ff79" />
+            <label for="technology-logo">Logotipo opcional (JPG, PNG, WebP ou GIF, até 4 MB)</label><input id="technology-logo" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+            <div id="technology-image-preview" class="image-preview"><span>Ícone padrão ou símbolo de reserva</span></div>
+            <label for="technology-logo-url">Ou URL HTTPS do logotipo</label><input id="technology-logo-url" placeholder="https://..." />
+            <p class="form-hint">Se não informar um logotipo, as tecnologias conhecidas usam Devicon; novas tecnologias mostram o símbolo indicado.</p>
+            <div class="form-actions"><button id="save-technology" class="button button-primary" type="submit">Salvar tecnologia ↗</button><button id="clear-technology" class="button button-outline" type="button">Limpar</button></div>
+          </form>
+        </div>
+      </div>
+      <div id="projects-panel" class="dashboard-grid" hidden><div class="admin-card admin-list"><div class="card-heading"><h2>Meus projetos</h2><button id="new-project" class="small-primary" type="button">+ Novo projeto</button></div><div id="admin-project-list" class="admin-project-list" aria-live="polite"></div></div>
       <div class="admin-card editor-card"><div class="card-heading"><h2 id="editor-title">Novo projeto</h2><span class="mini-label">EDITAR / PUBLICAR</span></div><form id="project-form"><input type="hidden" id="project-id"/><label for="project-title">Nome do projeto *</label><input id="project-title" required maxlength="100" placeholder="Ex.: Sistema de monitoramento IoT"/><label for="project-category">Categoria</label><select id="project-category"><option>Full Stack</option><option>IoT</option><option>Inteligência Artificial</option><option>Dados</option><option>Outros</option></select><label for="project-desc">Descrição *</label><textarea id="project-desc" rows="5" maxlength="1600" required placeholder="Explique o objetivo, o problema resolvido, seu papel e as tecnologias utilizadas."></textarea><label for="project-tags">Tecnologias (separadas por vírgula)</label><input id="project-tags" maxlength="350" placeholder="Ex.: Python, MQTT, React"/><label for="project-repo">Link do código (opcional)</label><input id="project-repo" type="url" placeholder="https://github.com/..."/><label for="project-demo">Link da demonstração (opcional)</label><input id="project-demo" type="url" placeholder="https://meu-projeto.com"/><label for="project-image">Imagem do projeto (JPG, PNG, WebP ou GIF; até 4 MB)</label><input id="project-image" type="file" accept="image/jpeg,image/png,image/webp,image/gif"/><div id="image-preview" class="image-preview"><span>Nenhuma imagem selecionada</span></div><label for="project-image-url">Ou link HTTPS da imagem</label><input id="project-image-url" placeholder="https://..."/><label class="check-line"><input id="project-featured" type="checkbox"/> Destacar projeto no início da galeria</label><div class="form-actions"><button id="save-btn" class="button button-primary" type="submit">Salvar projeto <span>↗</span></button><button id="clear-btn" class="button button-outline" type="button">Limpar</button></div></form><p class="form-hint">As alterações são salvas no armazenamento do site e aparecem na página pública após atualizar.</p></div></div>
       <div id="certificates-panel" class="dashboard-grid" hidden>
         <div class="admin-card admin-list">

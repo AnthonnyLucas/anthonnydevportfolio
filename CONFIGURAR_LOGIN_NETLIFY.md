@@ -1,4 +1,4 @@
-# Ativar o login administrativo na Netlify
+ # Ativar o login administrativo na Netlify
 
 O ícone do cadeado **não foi alterado**: permanece pequeno e discreto no canto inferior direito do rodapé. O painel fica em `/admin/`.
 
@@ -10,7 +10,7 @@ O ícone do cadeado **não foi alterado**: permanece pequeno e discreto no canto
 4. No painel da Netlify, abra o seu projeto → **Project configuration → Environment variables**. Adicione as variáveis ao ambiente **Production**, com escopo para **Functions** ou **All**; valores de hash e segredo devem ser privados.
 5. Publique o projeto pelo Git (não apenas enviando a pasta `public`) e faça novo deploy depois de inserir as variáveis.
 6. Acesse `https://SEU-SITE.netlify.app/admin/` ou clique no cadeado discreto no rodapé. Use seu e-mail e a senha original, **não o hash**.
-7. No dashboard, é possível inserir, editar e excluir projetos e enviar imagens. Os dados são salvos no Netlify Blobs e aparecem no site público.
+7. No dashboard, é possível editar textos, fotografias, tecnologias, projetos, certificados e enviar imagens. Os dados são salvos no Netlify Blobs e aparecem no site público.
 
 **Segurança:** a senha escolhida nesta conversa é curta e inteiramente numérica, portanto **não é recomendada para um painel exposto na internet**. Troque-a por uma senha exclusiva de, preferencialmente, 16 caracteres ou mais antes de publicar. Para mudar depois, execute novamente o gerador e atualize o hash e o segredo de sessão nas variáveis. Não salve senhas em HTML, JavaScript, `.env` no ZIP ou repositórios.
 
