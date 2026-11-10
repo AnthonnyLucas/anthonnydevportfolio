@@ -1,6 +1,6 @@
 # Portfólio Anthonny Lucas — Full Stack, IoT e Inteligência Artificial
 
-**Versão:** 5.11.0  
+**Versão:** 5.13.0  
 **Autor:** Anthonny Lucas Santos da Silva  
 **Tipo:** aplicação web de portfólio com painel administrativo (CMS)  
 **Publicação prevista:** Netlify, com funções de servidor e Netlify Blobs  
@@ -198,3 +198,10 @@ O painel **Tecnologias → Catálogo de logotipos** carrega sob demanda um índi
 Ao navegar com internet, o acervo oferece milhares de símbolos e logotipos. Para evitar lentidão, a interface renderiza somente 48 opções por vez e carrega imagens sob demanda; os índices de nomes ficam armazenados por sete dias no navegador. Se houver falha da API externa, a interface sinaliza o problema e mostra o botão para tentar novamente.
 
 A Netlify Function `icon-library.mjs` oferece uma recuperação pelo próprio domínio, limitada às três coleções permitidas. A função requer acesso à internet para obter os metadados. Confira **`ICONES_CREDITOS.md`** e **`ALTERACOES_V5_12_CATALOGO_ICONES.md`** para fontes, licenças, dependências e roteiro de testes.
+
+
+## Atualização v5.13 — Rolagem preservada na vitrine pública
+
+A janela de **Ampliar imagem** em **Formações** permanece fixa na área visível e não desloca o site para o Início. Fechar a imagem, pressionar Esc ou alterar o filtro preserva o ponto atual de leitura. A mudança não afeta a navegação proposital da sidebar nem o fluxo de confirmação ao salvar no painel administrativo.
+
+O CSS dos certificados recebeu uma nova versão de URL para atualizar o cache após o deploy. Consulte [`ALTERACOES_V5_13_ROLAGEM_PUBLICA.md`](ALTERACOES_V5_13_ROLAGEM_PUBLICA.md) para a explicação e a lista de verificações.

@@ -35,7 +35,10 @@
 .cert-nav button:disabled{cursor:not-allowed;opacity:.3}
 .cert-empty{padding:40px;color:var(--muted)}
 .cert-note{text-align:left;max-width:900px;margin:17px 0 0;font-size:11px;color:var(--muted)}
-.cert-dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:18px;max-width:min(92vw,1040px);max-height:92vh;padding:19px;box-shadow:0 40px 120px #000a}
+/* A janela modal precisa ficar fixa no viewport. Com o position:absolute
+   padrão do <dialog>, o foco automático do navegador rolava o documento até
+   o topo, inclusive após fechar a imagem ampliada. */
+.cert-dialog{position:fixed!important;inset:0;margin:auto;overflow-y:auto;overscroll-behavior:contain;background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:18px;max-width:min(92vw,1040px);max-height:92vh;padding:19px;box-shadow:0 40px 120px #000a}
 .cert-dialog::backdrop{background:#050914df;backdrop-filter:blur(7px)}
 .cert-dialog img{max-width:100%;max-height:75vh;object-fit:contain;display:block;margin:auto;border-radius:8px}
 .cert-dialog p{font-weight:700;font-size:13px;margin:10px 42px 0 0}

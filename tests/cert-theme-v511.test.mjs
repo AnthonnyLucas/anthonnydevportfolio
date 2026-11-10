@@ -11,7 +11,7 @@ test('v5.11: área de imagens dos certificados acompanha o Light Mode', () => {
   }
   assert.match(css, /html\[data-theme="light"\] \.cert-view:hover/);
   assert.match(css, /html\[data-theme="light"\] \.cert-no-image::after/);
-  assert.match(html, /cert-carousel\.css\?v=5\.11\.0/);
+  assert.match(html, /cert-carousel\.css\?v=5\.13\.0/);
 });
 test('v5.11: Dark Mode, certificados e navegação continuam intactos', () => {
   assert.match(css, /\.cert-visual\{[^}]*linear-gradient\(130deg,#2e3955,#12182b\)/);
