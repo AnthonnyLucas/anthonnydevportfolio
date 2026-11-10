@@ -1,0 +1,57 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {scryptSync} from 'node:crypto';
+import {getStore,reset} from './mock-blobs.mjs';
+import handler from '../netlify/functions/content.mjs';
+import {contentDefaults} from '../public/assets/site-schema.js';
+import {issueSession} from '../netlify/functions/lib/security.mjs';
+const html=readFileSync(new URL('../public/index.html',import.meta.url),'utf8');
+const client=readFileSync(new URL('../public/assets/content-client.js',import.meta.url),'utf8');
+const styles=readFileSync(new URL('../public/assets/v5-8.css',import.meta.url),'utf8');
+const endpoint='https://portfolio.test/.netlify/functions/content';
+process.env.ADMIN_EMAIL='qa@example.org';
+process.env.SESSION_SECRET='V58_AUTOMATED_TESTS_NEVER_DEPLOY_0123456789';
+const salt='fedcba9876543210abcdef9876543210';
+process.env.ADMIN_PASSWORD_HASH=`scrypt$${salt}$${scryptSync('test-secret',salt,64).toString('hex')}`;
+test('v5.8: links explícitos, sem mostrar endereço na interface; formulário Netlify preservado',()=>{
+  assert.match(html,/id="public-contact-email"[^>]+href="https:\/\/mail\.google\.com/);
+  assert.match(html,/id="public-contact-whatsapp"[^>]+href="https:\/\/api\.whatsapp\.com/);
+  assert.match(html,/<span>E-mail<\/span>/);
+  assert.match(html,/<span>WhatsApp<\/span>/);
+  assert.doesNotMatch(html,/data-content-key="contactEmail"/);
+  assert.match(html,/name="contato-portfolio"/);
+  for(const key of ['name="bot-field"','name="form-name"','name="name"','name="email"','name="subject"','name="message"'])assert.ok(html.includes(key),key);
+  assert.match(html,/class="contact-form contact-form-glass reveal"/);
+  assert.match(html,/contact-code-art/);
+  assert.match(html,/v5-8\.css/);
+});
+test('v5.8: UI usa os mesmos links nos ícones e contatos',()=>{
+  assert.match(client,/bindContactLink\(root\.querySelector\('#sidebar-gmail'\),gmailHref/);
+  assert.match(client,/bindContactLink\(root\.querySelector\('#public-contact-email'\),gmailHref/);
+  assert.match(client,/bindContactLink\(root\.querySelector\('#sidebar-whatsapp'\),whatsappHref/);
+  assert.match(client,/bindContactLink\(root\.querySelector\('#public-contact-whatsapp'\),whatsappHref/);
+  assert.match(styles,/backdrop-filter:blur\(26px\)/);
+  assert.match(styles,/prefers-reduced-motion/);
+});
+test('v5.8: atualização de valores antigos e preservação de alterações futuras',async()=>{
+  reset();
+  const store=getStore('portfolio-site-content');
+  await store.setJSON('current',{revision:6,values:{gmailUrl:'mailto:anthonny6613@gmail.com',whatsappUrl:'',contactMessage:'Mensagem editada'}});
+  let data=await (await handler(new Request(endpoint))).json();
+  assert.equal(data.content.gmailUrl,contentDefaults.gmailUrl);
+  assert.equal(data.content.whatsappUrl,contentDefaults.whatsappUrl);
+  assert.equal(data.content.contactMessage,'Mensagem editada');
+  const req=new Request(endpoint,{method:'PATCH',headers:{Origin:'https://portfolio.test',Cookie:`portfolio_session=${issueSession()}`,'Content-Type':'application/json'},body:JSON.stringify({revision:6,patch:{contactMessage:'Nova mensagem'}})});
+  const res=await handler(req);
+  assert.equal(res.status,200);
+  const saved=await store.get('current',{type:'json'});
+  assert.equal(saved.schemaVersion,8);
+  assert.equal(saved.values.gmailUrl,contentDefaults.gmailUrl);
+  assert.equal(saved.values.whatsappUrl,contentDefaults.whatsappUrl);
+  // Após migração, uma edição personalizada nunca pode ser substituída pelo default.
+  await store.setJSON('current',{revision:9,schemaVersion:8,values:{gmailUrl:'mailto:custom@example.com',whatsappUrl:'https://wa.me/5581999999999'}});
+  data=await (await handler(new Request(endpoint))).json();
+  assert.equal(data.content.gmailUrl,'mailto:custom@example.com');
+  assert.equal(data.content.whatsappUrl,'https://wa.me/5581999999999');
+});

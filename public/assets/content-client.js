@@ -1,5 +1,47 @@
 import { contentDefaults, contentFields } from './site-schema.js';
 const validKeys = new Set(contentFields.map(item=>item.key));
+// Normaliza links permitidos; nunca aceita javascript:, redirecionamentos arbitrários ou URLs com credenciais.
+const CONTACT_EMAIL_PATTERN = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+const LEGACY_MAIL = 'mailto:anthonny6613@gmail.com';
+function getMailHref(configured, contactEmail) {
+  const raw = String(configured || '').trim();
+  const value = (!raw || raw === LEGACY_MAIL) ? contentDefaults.gmailUrl : raw;
+  if (CONTACT_EMAIL_PATTERN.test(value)) return `mailto:${value}`;
+  if (/^mailto:/i.test(value) && CONTACT_EMAIL_PATTERN.test(value.slice(7))) return `mailto:${value.slice(7)}`;
+  try {
+    const link = new URL(value);
+    if (link.protocol==='https:' && link.hostname.toLowerCase()==='mail.google.com' && link.pathname.startsWith('/mail') && CONTACT_EMAIL_PATTERN.test(link.searchParams.get('to') || '') && !link.username && !link.password) return link.href;
+  } catch { /* Sem URL de composição válida. */ }
+  return CONTACT_EMAIL_PATTERN.test(contactEmail) ? `mailto:${contactEmail}` : '';
+}
+function getWhatsAppHref(configured) {
+  // As migrações de registros antigos são feitas pela API; em v5.8, apagar o campo desativa o link.
+  const raw = String(configured ?? contentDefaults.whatsappUrl).trim();
+  try {
+    const link = new URL(raw);
+    if (link.protocol!=='https:' || link.username || link.password) return '';
+    const host=link.hostname.toLowerCase();
+    if (host==='wa.me' && /^\/\d{10,15}\/?$/.test(link.pathname)) return link.href;
+    if (['api.whatsapp.com','web.whatsapp.com'].includes(host) && link.pathname.startsWith('/send') && /^\d{10,15}$/.test(link.searchParams.get('phone') || '')) return link.href;
+  } catch { /* Link inválido ou não cadastrado. */ }
+  return '';
+}
+function bindContactLink(node, href, label, newTab=true) {
+  if (!node) return;
+  node.classList.toggle('sidebar-social-icon-pending', !href && node.classList.contains('sidebar-social-icon'));
+  if (href) {
+    node.href=href;
+    node.removeAttribute('aria-disabled');
+    node.setAttribute('aria-label',label);
+    if (newTab && href.startsWith('https://')) {node.target='_blank';node.rel='noopener noreferrer';}
+    else {node.removeAttribute('target');node.removeAttribute('rel');}
+    node.removeAttribute('tabindex');
+  } else {
+    node.removeAttribute('href');node.removeAttribute('target');node.removeAttribute('rel');
+    node.setAttribute('aria-disabled','true');node.setAttribute('tabindex','-1');
+  }
+}
+
 export function applyContent(content = contentDefaults, root = document) {
   const values = {...contentDefaults, ...Object.fromEntries(Object.entries(content).filter(([key,value])=>validKeys.has(key) && typeof value==='string'))};
   root.querySelectorAll('[data-content-key]').forEach(node=>{
@@ -30,38 +72,13 @@ export function applyContent(content = contentDefaults, root = document) {
     const link=root.createElement('a');link.href=url;link.textContent=title;
     link.target='_blank';link.rel='noopener noreferrer';customs.append(link);
   }}
-  const contact = root.querySelector('#public-contact-email');
-  if (contact && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.contactEmail)) contact.href=`mailto:${values.contactEmail}`;
-  // Gmail é um link independente, editável em Páginas & Textos > Redes sociais.
-  const sidebarMail=root.querySelector('#sidebar-gmail');
-  if(sidebarMail){
-    let gmailHref='';
-    const configured=typeof values.gmailUrl==='string'?values.gmailUrl.trim():'';
-    if(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(configured)) gmailHref=`mailto:${configured}`;
-    else if(/^mailto:[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(configured)) gmailHref=configured;
-    else {
-      try {
-        const link=new URL(configured);
-        if(link.protocol==='https:'&&link.hostname.toLowerCase()==='mail.google.com'&&link.pathname.startsWith('/mail')&&link.searchParams.get('to')&&!link.username&&!link.password) gmailHref=link.href;
-      } catch { /* Link de e-mail simples ou não preenchido. */ }
-    }
-    if(!gmailHref && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.contactEmail)) gmailHref=`mailto:${values.contactEmail}`;
-    if(gmailHref){sidebarMail.href=gmailHref;sidebarMail.removeAttribute('aria-disabled');sidebarMail.classList.remove('sidebar-social-icon-pending');sidebarMail.title='Enviar e-mail';}
-    else{sidebarMail.removeAttribute('href');sidebarMail.setAttribute('aria-disabled','true');sidebarMail.classList.add('sidebar-social-icon-pending');sidebarMail.title='Configure um e-mail de contato no painel';}
-  }
-  // Sem número real cadastrado, o ícone permanece visível, porém não é um link falso.
-  const whatsapp=root.querySelector('#sidebar-whatsapp');
-  if (whatsapp) {
-    let validWhatsapp=false;
-    try {
-      const parsed=new URL(values.whatsappUrl);
-      validWhatsapp=parsed.protocol==='https:' && ['wa.me','api.whatsapp.com','web.whatsapp.com'].includes(parsed.hostname.toLowerCase()) &&
-        (parsed.hostname.toLowerCase() !== 'wa.me' || /^\/\d{10,15}\/?$/.test(parsed.pathname));
-    } catch { /* Nenhum link cadastrado. */ }
-    whatsapp.classList.toggle('sidebar-social-icon-pending',!validWhatsapp);
-    if(validWhatsapp){whatsapp.href=values.whatsappUrl;whatsapp.target='_blank';whatsapp.rel='noopener noreferrer';whatsapp.removeAttribute('aria-disabled');whatsapp.setAttribute('aria-label','Conversar pelo WhatsApp');whatsapp.title='WhatsApp';}
-    else{whatsapp.removeAttribute('href');whatsapp.removeAttribute('target');whatsapp.removeAttribute('rel');whatsapp.setAttribute('aria-disabled','true');whatsapp.setAttribute('aria-label','WhatsApp (configure o número no painel)');whatsapp.title='Configure o link do WhatsApp no painel';}
-  }
+  // Todos os atalhos de contato utilizam os mesmos campos editáveis do CMS.
+  const gmailHref=getMailHref(values.gmailUrl,values.contactEmail);
+  const whatsappHref=getWhatsAppHref(values.whatsappUrl);
+  bindContactLink(root.querySelector('#sidebar-gmail'),gmailHref,'Enviar mensagem por e-mail');
+  bindContactLink(root.querySelector('#public-contact-email'),gmailHref,'E-mail: abrir composição de mensagem');
+  bindContactLink(root.querySelector('#sidebar-whatsapp'),whatsappHref,'Conversar pelo WhatsApp');
+  bindContactLink(root.querySelector('#public-contact-whatsapp'),whatsappHref,'WhatsApp: iniciar conversa');
   const portrait = values.aboutImage;
   if (portrait && (/^https:\/\//i.test(portrait) || /^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(portrait))) {
     root.querySelectorAll('[data-portrait]').forEach(img => {

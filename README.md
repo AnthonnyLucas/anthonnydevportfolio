@@ -127,3 +127,8 @@ Ao clicar em “Ver todas as tecnologias” ou “Ver todas as formações”, a
 - Depois de qualquer alteração persistida no servidor (textos, categorias, tecnologias, projetos e formações), o painel volta suavemente ao topo e exibe um aviso de sucesso.
 - Se houver erro, a página permanece na posição atual e mostra um aviso de falha; os dados não são anunciados como salvos.
 - Mensagens temporárias como “Enviando imagem” e login não provocam rolagem automática.
+
+
+## Atualização v5.8 — Contato
+
+O endereço de contato deixou de ser exibido diretamente na seção Contato. No lugar, há os links **E-mail** (composição do Gmail) e **WhatsApp**. Os mesmos links também estão nos ícones da sidebar e permanecem editáveis em **Admin > Páginas & Textos > Redes sociais**. O formulário continua usando o Netlify Forms e ganhou efeito de vidro. Uma animação de código substitui a estrela. Detalhes e passos de validação: `ALTERACOES_V5_8_CONTATO.md`.

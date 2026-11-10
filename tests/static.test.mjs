@@ -66,7 +66,7 @@ test('v5.6 uses floating side navigation across all showcases and editable sideb
  }
  for(const cls of ['tech-carousel-navigation glass-carousel-nav','project-nav glass-carousel-nav','cert-nav glass-carousel-nav'])assert.ok(html.includes(cls),cls);
  for(const selector of ['.glass-carousel-nav','.glass-nav-button','.sidebar-social-icon-pending'])assert.ok(css.includes(selector),selector);
- assert.equal(schema.contentDefaults.whatsappUrl,'');
+ assert.equal(schema.contentDefaults.whatsappUrl,'https://api.whatsapp.com/send/?phone=5581999318775&text&type=phone_number&app_absent=0');
  assert.equal(schema.contentFields.find(f=>f.key==='whatsappUrl')?.group,'redes');
  assert.equal(schema.contentFields.find(f=>f.key==='gmailUrl')?.group,'redes');
  const client=read('public/assets/content-client.js');

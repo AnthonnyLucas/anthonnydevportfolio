@@ -20,8 +20,8 @@ const post=async(revision,patch)=> {
 test('V5.7: links editáveis agrupados em Redes sociais com as quatro opções',()=>{
   assert.ok(contentGroups.some(x=>x.id==='redes'));
   for(const key of ['githubUrl','linkedinUrl','gmailUrl','whatsappUrl'])assert.equal(contentFields.find(x=>x.key===key)?.group,'redes');
-  assert.equal(contentDefaults.gmailUrl,'mailto:anthonny6613@gmail.com');
-  assert.equal(contentDefaults.whatsappUrl,'');
+  assert.equal(contentDefaults.gmailUrl,'https://mail.google.com/mail/u/0/?to=anthonny6613@gmail.com&fs=1&tf=cm');
+  assert.equal(contentDefaults.whatsappUrl,'https://api.whatsapp.com/send/?phone=5581999318775&text&type=phone_number&app_absent=0');
   const admin=read('cms-admin.js');assert.match(admin,/gmailUrl/);assert.match(admin,/whatsappUrl/);
 });
 test('V5.7: servidor salva links de Gmail e WhatsApp e rejeita URL maliciosa',async()=>{

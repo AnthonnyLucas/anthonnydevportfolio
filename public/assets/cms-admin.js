@@ -68,8 +68,8 @@ export function setupCmsAdmin({request,showStatus}) {
       if(spec.type==='textarea'){input=create('textarea');input.rows=4;}
       else {input=create('input');input.type=spec.type==='email'?'email':spec.type==='url'?'url':spec.type==='range'?'range':'text';}
       input.id=`cms-field-${spec.key}`;input.maxLength=spec.max;
-      if(spec.key==='gmailUrl')input.placeholder='mailto:seuemail@gmail.com ou https://mail.google.com/mail/?view=cm&fs=1&to=...';
-      if(spec.key==='whatsappUrl')input.placeholder='https://wa.me/55DDDNUMERO';
+      if(spec.key==='gmailUrl')input.placeholder='https://mail.google.com/mail/u/0/?to=seuemail@gmail.com&fs=1&tf=cm';
+      if(spec.key==='whatsappUrl')input.placeholder='https://api.whatsapp.com/send/?phone=55DDDNUMERO';
       input.value=state.content[spec.key]??spec.defaultValue;
       if(spec.type==='range'){input.min='0';input.max='100';input.step='1';input.removeAttribute('maxlength');}
       input.addEventListener('input',showCmsPreview);

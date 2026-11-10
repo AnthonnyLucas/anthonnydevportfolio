@@ -2,6 +2,14 @@ import { getStore } from '@netlify/blobs';
 import { contentDefaults, contentFields } from '../../public/assets/site-schema.js';
 import { authError, json, sameOrigin, validSession } from './lib/security.mjs';
 const schema = new Map(contentFields.map(item => [item.key, item]));
+const CONTACT_SCHEMA_VERSION = 8;
+function upgradeLegacyContacts(values, saved) {
+  if (Number(saved?.schemaVersion || 0) >= CONTACT_SCHEMA_VERSION) return values;
+  // Antes de v5.8: Gmail padrão mailto e WhatsApp sem configuração.
+  if (!values.gmailUrl || values.gmailUrl === 'mailto:anthonny6613@gmail.com') values.gmailUrl = contentDefaults.gmailUrl;
+  if (!values.whatsappUrl) values.whatsappUrl = contentDefaults.whatsappUrl;
+  return values;
+}
 export function sanitizeContent(patch) {
   if (!patch || typeof patch !== 'object' || Array.isArray(patch)) throw new Error('Conteúdo inválido.');
   const output = {};
@@ -40,7 +48,7 @@ export default async function handler(req) {
     if (req.method === 'PATCH' && !sameOrigin(req)) return json({error:'Origem não autorizada.'},403);
     const store = getStore('portfolio-site-content');
     const saved = await store.get('current', {type:'json'});
-    const current = { ...contentDefaults, ...(saved?.values && typeof saved.values === 'object' ? sanitizeContent(saved.values) : {}) };
+    const current = upgradeLegacyContacts({ ...contentDefaults, ...(saved?.values && typeof saved.values === 'object' ? sanitizeContent(saved.values) : {}) }, saved);
     const revision = Number.isSafeInteger(saved?.revision) ? saved.revision : 0;
     if (req.method === 'GET') return json({content:current,revision});
     const data = await req.json().catch(() => null);
@@ -49,7 +57,7 @@ export default async function handler(req) {
     const updates = sanitizeContent(data.patch);
     if (!Object.keys(updates).length) return json({error:'Nenhum campo enviado.'},400);
     const next = { ...current, ...updates };
-    await store.setJSON('current',{values:next,revision:revision+1,updatedAt:new Date().toISOString()});
+    await store.setJSON('current',{values:next,revision:revision+1,schemaVersion:CONTACT_SCHEMA_VERSION,updatedAt:new Date().toISOString()});
     return json({content:next,revision:revision+1});
   } catch (error) {
     if (/inválid|não permitido|excedeu|Enquadramento/i.test(error.message||'')) return json({error:error.message},400);
