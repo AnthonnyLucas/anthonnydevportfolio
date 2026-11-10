@@ -308,3 +308,72 @@
 @media (prefers-reduced-motion: reduce) {
   #technologies-panel .tech-category-shortcut { transition: none; }
 }
+
+
+/* v5.4 — expansão funcional das DUAS listas superiores.
+   Desktop: o editor da direita determina a altura disponível. O gerenciador
+   de categorias permanece independente e rolável; nenhum corte fixo em px
+   é aplicado à lista quando "Ver todas" está ativo. */
+@media (min-width: 931px) {
+  .admin-body #technologies-panel.tech-list-expanded > .admin-list {
+    display: flex;
+    flex-direction: column;
+    height: var(--tech-editor-height, auto);
+    max-height: var(--tech-editor-height, none);
+    min-height: 0;
+    overflow: hidden;
+  }
+  .admin-body #technologies-panel.tech-list-expanded > .admin-list #admin-tech-list {
+    /* Sobrescreve a reserva 2:1 de v5.3, que encurtava a lista. */
+    flex: 1 1 0;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+  }
+  .admin-body #technologies-panel.tech-list-expanded > .admin-list #technology-category-manager[open] {
+    /* Mantém o gerenciador como a segunda lista com rolagem própria. */
+    flex: 0 0 auto;
+    height: auto;
+    min-height: 0;
+    max-height: 245px;
+    overflow-y: auto;
+  }
+  .admin-body #certificates-panel.cert-list-expanded > .admin-list {
+    display: flex;
+    flex-direction: column;
+    height: var(--cert-editor-height, auto);
+    max-height: var(--cert-editor-height, none);
+    min-height: 0;
+    overflow: hidden;
+  }
+  .admin-body #certificates-panel.cert-list-expanded > .admin-list #admin-cert-list {
+    flex: 1 1 0;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow-y: auto;
+  }
+  .admin-body #certificates-panel.cert-list-expanded > .admin-list > .admin-category-manager {
+    flex: 0 0 auto;
+  }
+}
+/* No celular não há editor ao lado: as listas podem mostrar integralmente
+   seus registros e a rolagem pertence à página, sem área minúscula fixa. */
+@media (max-width: 930px) {
+  .admin-body #technologies-panel.tech-list-expanded > .admin-list,
+  .admin-body #certificates-panel.cert-list-expanded > .admin-list {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+  }
+  .admin-body #technologies-panel.tech-list-expanded > .admin-list #admin-tech-list,
+  .admin-body #certificates-panel.cert-list-expanded > .admin-list #admin-cert-list {
+    flex: 0 0 auto;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+    overflow: visible;
+  }
+}

@@ -110,3 +110,7 @@ Se aparecer “operação inválida” ou falha no login, consulte `CONFIGURAR_L
 ## Layout de Tecnologias — v5.2
 
 O botão **Ver todas as tecnologias** amplia a lista na coluna esquerda do painel administrativo, aproveitando a altura do formulário à direita sem excedê-la. Consulte `ALTERACOES_V5_2_LAYOUT_TECNOLOGIAS.md` para detalhes e testes.
+
+
+## Ajuste v5.4 — Listas expansíveis no painel
+Ao clicar em “Ver todas as tecnologias” ou “Ver todas as formações”, as listas superiores ocupam o espaço disponível em vez de ficarem presas à altura compacta anterior. Para detalhes, veja `ALTERACOES_V5_4_EXPANSAO_LISTAS.md`.

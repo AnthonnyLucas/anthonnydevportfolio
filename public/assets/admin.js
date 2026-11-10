@@ -224,6 +224,8 @@ function renderCertList() {
   qs('#cert-list-summary').textContent=`${shown.length} de ${matched.length} resultados`;
   qs('#cert-show-all').hidden=matched.length<=5;
   qs('#cert-show-all').textContent=state.certShowAll?'Mostrar menos':'Ver todas as formações';
+  qs('#cert-show-all').setAttribute('aria-expanded',String(state.certShowAll && matched.length>5));
+  qs('#certificates-panel').classList.toggle('cert-list-expanded',state.certShowAll && matched.length>5);
   if(!shown.length){const empty=document.createElement('p');empty.className='list-empty';empty.textContent='Nenhuma formação encontrada.';list.append(empty);return;}
   shown.forEach(course=>{
     const row=document.createElement('article');row.className='admin-list-item';
@@ -244,7 +246,18 @@ function renderCertList() {
 }
 qs('#cert-search').addEventListener('input',()=>{state.certShowAll=false;renderCertList();});
 qs('#cert-filter').addEventListener('change',()=>{state.certShowAll=false;renderCertList();});
-qs('#cert-show-all').addEventListener('click',()=>{state.certShowAll=!state.certShowAll;renderCertList();});
+// Medir o formulário ao lado permite expandir a lista até a área realmente
+// disponível, em vez de mantê-la presa ao limite de 405px do modo compacto.
+const certEditor=qs('.cert-editor-card');
+function alignCertColumns(){
+  if(window.matchMedia('(min-width: 931px)').matches){
+    const height=Math.ceil(certEditor.getBoundingClientRect().height);
+    if(height>0)qs('#certificates-panel').style.setProperty('--cert-editor-height',`${height}px`);
+  }else qs('#certificates-panel').style.removeProperty('--cert-editor-height');
+}
+if(typeof ResizeObserver!=='undefined')new ResizeObserver(alignCertColumns).observe(certEditor);
+window.addEventListener('resize',alignCertColumns,{passive:true});
+qs('#cert-show-all').addEventListener('click',()=>{state.certShowAll=!state.certShowAll;renderCertList();qs('#admin-cert-list').scrollTop=0;alignCertColumns();});
 function selectTab(name) {
   const panels={content:'#content-panel',technologies:'#technologies-panel',projects:'#projects-panel',certificates:'#certificates-panel'};
   for(const [key,selector] of Object.entries(panels)) {
@@ -253,6 +266,7 @@ function selectTab(name) {
     tab.classList.toggle('active',key===name);
     tab.setAttribute('aria-selected',String(key===name));
   }
+  if(name==='certificates')requestAnimationFrame(alignCertColumns);
 }
 for(const name of ['content','technologies','projects','certificates']) {
   qs(`#tab-${name}`).addEventListener('click',()=>selectTab(name));
