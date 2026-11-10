@@ -1,0 +1,43 @@
+/* Technological coverflow: focused, tactile, and calm. Follows the existing light/dark themes. */
+.tech-carousel-shell{--tech-slot:clamp(120px,19vw,205px);margin-top:18px;position:relative;isolation:isolate}
+.tech-carousel-stage{height:375px;position:relative;perspective:1100px;perspective-origin:center 40%;overflow:hidden;cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none;border:1px solid color-mix(in srgb,var(--line) 58%,transparent);border-radius:26px;background:radial-gradient(ellipse 44% 49% at 50% 47%,color-mix(in srgb,var(--cyan) 13%,transparent),transparent 86%),radial-gradient(ellipse 60% 45% at 50% 101%,color-mix(in srgb,var(--purple) 16%,transparent),transparent 85%),linear-gradient(125deg,color-mix(in srgb,var(--panel) 70%,var(--bg)),var(--bg));box-shadow:inset 0 1px #ffffff10,0 20px 80px #0002}
+.tech-carousel-stage:active{cursor:grabbing}
+.tech-carousel-stage:focus-visible{outline:2px solid var(--green);outline-offset:4px}
+.tech-stage-light{position:absolute;left:50%;top:36px;width:min(470px,85%);height:340px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(ellipse at 50% 50%,color-mix(in srgb,var(--cyan) 9%,transparent),transparent 72%);filter:blur(20px);pointer-events:none}
+.tech-carousel-track{position:absolute;inset:0;transform-style:preserve-3d;pointer-events:none}
+.tech-stage-horizon{position:absolute;bottom:30px;left:17%;width:66%;height:35px;border-radius:50%;background:radial-gradient(ellipse,color-mix(in srgb,var(--green) 18%,transparent),transparent 70%);filter:blur(18px);opacity:.8;pointer-events:none}
+.tech-slide{--brand:#b7ff79;position:absolute;top:45px;left:50%;margin-left:-128px;width:256px;height:267px;padding:17px 20px 18px;border:1px solid color-mix(in srgb,var(--brand) 35%,var(--line));border-radius:21px;color:var(--text);text-align:left;background:linear-gradient(155deg,rgba(255,255,255,.1) 0%,transparent 39%),radial-gradient(circle at 50% 44%,color-mix(in srgb,var(--brand) 15%,transparent),transparent 75%),color-mix(in srgb,var(--panel) 92%,var(--bg));-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);display:flex;flex-direction:column;align-items:stretch;gap:0;box-shadow:inset 0 1px rgba(255,255,255,.18),inset 0 -18px 55px rgba(0,0,0,.05),0 24px 70px #0008;transform-style:preserve-3d;transition:transform .62s cubic-bezier(.22,.74,.13,1),opacity .48s ease,filter .5s ease,border-color .35s,box-shadow .35s;outline-offset:4px;will-change:transform,opacity;overflow:hidden}
+.tech-slide::before{content:"";position:absolute;inset:-60% auto auto -20%;width:115%;height:130%;transform:rotate(27deg);background:linear-gradient(90deg,transparent 20%,rgba(255,255,255,.09) 49%,transparent 57%);pointer-events:none}
+.tech-slide::after{content:"";position:absolute;left:25%;right:25%;bottom:0;height:2px;background:linear-gradient(90deg,transparent,var(--brand),transparent);opacity:.65;box-shadow:0 0 12px var(--brand)}
+.tech-slide[data-position="0"]{opacity:1;transform:translate3d(0,0,78px) rotateY(0) scale(1);z-index:9;filter:none;border-color:color-mix(in srgb,var(--brand) 48%,var(--line));box-shadow:inset 0 1px rgba(255,255,255,.2),0 25px 75px #0008,0 0 38px color-mix(in srgb,var(--brand) 16%,transparent)}
+.tech-slide[data-position="-1"]{opacity:.82;transform:translate3d(calc(var(--tech-slot)*-1),5px,-70px) rotateY(29deg) scale(.87);z-index:6;filter:saturate(.78)}
+.tech-slide[data-position="1"]{opacity:.82;transform:translate3d(var(--tech-slot),5px,-70px) rotateY(-29deg) scale(.87);z-index:6;filter:saturate(.78)}
+.tech-slide[data-position="-2"]{opacity:.4;transform:translate3d(calc(var(--tech-slot)*-2),16px,-175px) rotateY(40deg) scale(.72);z-index:2;filter:blur(.5px) saturate(.6)}
+.tech-slide[data-position="2"]{opacity:.4;transform:translate3d(calc(var(--tech-slot)*2),16px,-175px) rotateY(-40deg) scale(.72);z-index:2;filter:blur(.5px) saturate(.6)}
+.tech-slide[data-position="off"]{opacity:0;visibility:hidden;pointer-events:none;transform:translate3d(0,14px,-350px) scale(.45);z-index:0;transition:transform .48s,opacity .35s,visibility 0s linear .48s}
+.tech-slide:hover:not([data-position="off"]){border-color:color-mix(in srgb,var(--brand) 65%,white 5%)}
+.tech-slide-top,.tech-slide-footer{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;font:700 9px/1.5 var(--display);letter-spacing:.15em;color:var(--muted)}
+.tech-slide-top>span:first-child{color:color-mix(in srgb,var(--brand) 82%,var(--text))}
+.tech-slide-top>span:last-child{opacity:.65}
+.tech-slide-center{flex:1;display:grid;place-items:center;position:relative;min-height:140px;padding-top:4px}
+.tech-logo-wrap{width:98px;height:98px;display:grid;place-items:center;filter:drop-shadow(0 6px 25px color-mix(in srgb,var(--brand) 17%,transparent))}
+.tech-logo{width:83px;height:83px;object-fit:contain;-webkit-user-drag:none;-webkit-box-reflect:below 3px linear-gradient(transparent 17%,rgba(255,255,255,.095) 100%);image-rendering:auto}
+.tech-slide-title{font:700 24px/1.06 var(--display);letter-spacing:-.045em;color:var(--text);margin-bottom:9px;position:relative;z-index:1;text-align:center}
+.tech-slide-footer{justify-content:center;letter-spacing:.2em;font-size:8px;opacity:.5}
+.tech-carousel-controls{display:flex;justify-content:center;align-items:center;gap:clamp(16px,3vw,40px);margin:20px auto 0}
+.tech-arrow{width:48px;height:48px;display:grid;place-items:center;border:1px solid var(--line);border-radius:50%;background:var(--panel);color:var(--text);box-shadow:0 8px 25px #0002;transition:transform .22s ease,background .22s ease,color .22s,border-color .22s}
+.tech-arrow svg{width:20px;height:20px}
+.tech-arrow:hover{transform:translateY(-3px);border-color:var(--green);background:var(--green);color:var(--bg)}
+.tech-carousel-progress{display:flex;align-items:center;gap:14px;font:700 12px var(--display);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+#tech-current{color:var(--text)}#tech-total{color:var(--muted)}
+.tech-progress-line{display:block;width:clamp(78px,12vw,155px);height:3px;border-radius:50px;background:var(--line);overflow:hidden}.tech-progress-line i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--green),var(--cyan));border-radius:50px;transition:width .35s ease}
+.tech-carousel-hint{text-align:center;display:flex;align-items:center;justify-content:center;gap:9px;font-size:11px;color:var(--muted);margin:15px 0 0}
+.tech-carousel-hint svg{width:17px;height:17px;color:var(--green)}
+.tech-carousel-hint span{opacity:.45}
+.sr-only{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+html[data-theme="light"] .tech-carousel-stage{background:radial-gradient(ellipse at 50% 60%,rgba(63,134,232,.12),transparent 56%),linear-gradient(140deg,#eaf0f9,#f7f9fc)}
+html[data-theme="light"] .tech-slide{box-shadow:inset 0 1px rgba(255,255,255,.86),0 25px 55px #6883ae42;background:linear-gradient(145deg,rgba(255,255,255,.91),rgba(245,248,253,.78)),radial-gradient(circle,color-mix(in srgb,var(--brand) 18%,transparent),transparent)}
+html[data-theme="light"] .tech-slide::before{background:linear-gradient(90deg,transparent 20%,rgba(255,255,255,.5) 49%,transparent 57%)}
+@media(max-width:750px){.tech-carousel-shell{--tech-slot:clamp(112px,20vw,145px)}.tech-carousel-stage{height:350px;border-radius:22px}.tech-slide{top:50px;width:226px;height:241px;margin-left:-113px;padding:15px 16px}.tech-slide-title{font-size:22px}.tech-slide-center{min-height:125px}.tech-logo{width:75px;height:75px}.tech-carousel-hint{font-size:10px}}
+@media(max-width:460px){.tech-carousel-shell{--tech-slot:112px}.tech-carousel-stage{height:325px}.tech-slide{top:43px;width:205px;height:225px;margin-left:-102.5px}.tech-slide-title{font-size:20px}.tech-slide[data-position="-2"],.tech-slide[data-position="2"]{opacity:.16}.tech-carousel-hint{flex-wrap:wrap;gap:6px}}
+@media(prefers-reduced-motion:reduce){.tech-slide,.tech-arrow,.tech-progress-line i{transition-duration:.01ms!important}.tech-carousel-stage{scroll-behavior:auto}}

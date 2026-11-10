@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Django">
+  <defs><linearGradient id="grad13" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#42B08C"/><stop offset="1" stop-color="#ffffff" stop-opacity=".78"/></linearGradient></defs>
+  <rect x="8" y="8" width="104" height="104" rx="28" fill="#42B08C" fill-opacity=".13" stroke="#42B08C" stroke-opacity=".28"/>
+  <path d="M25 35 Q60 8 95 35" fill="none" stroke="#42B08C" stroke-opacity=".18" stroke-width="2"/>
+  <text x="60" y="72" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="800" text-anchor="middle" fill="url(#grad13)" letter-spacing="-1">dj</text>
+  <path d="M37 91h46" stroke="#42B08C" stroke-width="2" stroke-linecap="round" opacity=".35"/>
+</svg>

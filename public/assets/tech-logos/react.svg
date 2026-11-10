@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="React">
+  <defs><linearGradient id="grad9" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#60D5F3"/><stop offset="1" stop-color="#ffffff" stop-opacity=".78"/></linearGradient></defs>
+  <rect x="8" y="8" width="104" height="104" rx="28" fill="#60D5F3" fill-opacity=".13" stroke="#60D5F3" stroke-opacity=".28"/>
+  <path d="M25 35 Q60 8 95 35" fill="none" stroke="#60D5F3" stroke-opacity=".18" stroke-width="2"/>
+  <text x="60" y="72" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="800" text-anchor="middle" fill="url(#grad9)" letter-spacing="-1">Re</text>
+  <path d="M37 91h46" stroke="#60D5F3" stroke-width="2" stroke-linecap="round" opacity=".35"/>
+</svg>
