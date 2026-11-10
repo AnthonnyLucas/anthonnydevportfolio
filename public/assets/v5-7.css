@@ -1,0 +1,120 @@
+/* v5.7 — Navegação minimalista FORA dos cartões e vitrines.
+   As laterais ocupam colunas próprias: nada de sobreposição. */
+.tech-carousel-shell,
+.project-viewport-wrap,
+.cert-viewport-wrap {
+  --carousel-gutter: clamp(30px, 3.7vw, 56px);
+  --carousel-gap: clamp(3px, .65vw, 10px);
+  display: grid;
+  grid-template-columns: var(--carousel-gutter) minmax(0, 1fr) var(--carousel-gutter);
+  column-gap: var(--carousel-gap);
+  align-items: start;
+  min-width: 0;
+  position: relative;
+  isolation: isolate;
+}
+.tech-carousel-shell > .tech-carousel-stage,
+.project-viewport-wrap > .project-viewport,
+.cert-viewport-wrap > .cert-viewport { grid-column: 2; min-width: 0; width: 100%; }
+.tech-carousel-shell > .tech-carousel-controls,
+.tech-carousel-shell > .tech-carousel-hint { grid-column: 2; }
+/* Setas são elementos isolados, sem quadrado, fundo, blur ou contorno. */
+.glass-carousel-nav {
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  z-index: 25;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0;
+  pointer-events: none;
+}
+.tech-carousel-navigation { top: 187.5px; }
+.glass-carousel-nav .glass-nav-button,
+.glass-carousel-nav .tech-arrow,
+.project-nav .glass-nav-button,
+.cert-nav .glass-nav-button,
+html[data-theme="light"] .glass-carousel-nav .glass-nav-button {
+  width: var(--carousel-gutter);
+  height: 52px;
+  min-width: 0;
+  min-height: 44px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  flex: none;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  color: var(--text);
+  opacity: .82;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: color .18s ease, opacity .18s ease, transform .18s ease, filter .18s ease;
+}
+.glass-carousel-nav .glass-nav-button svg,
+.glass-carousel-nav .tech-arrow svg {
+  display: block;
+  width: 34px;
+  height: 34px;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,.4));
+}
+.glass-carousel-nav .glass-nav-button:hover:not(:disabled),
+.glass-carousel-nav .glass-nav-button:focus-visible,
+html[data-theme="light"] .glass-carousel-nav .glass-nav-button:hover:not(:disabled) {
+  transform: scale(1.17);
+  color: var(--green);
+  opacity: 1;
+  border: 0;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  filter: drop-shadow(0 0 7px color-mix(in srgb, var(--green) 45%, transparent));
+}
+.glass-carousel-nav .glass-nav-button:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: -3px;
+  border-radius: 6px;
+}
+.glass-carousel-nav .glass-nav-button:disabled {
+  opacity: .25;
+  cursor: not-allowed;
+  box-shadow: none;
+  filter: none;
+  transform: none;
+}
+@media (max-width: 900px) {
+  .tech-carousel-shell,.project-viewport-wrap,.cert-viewport-wrap {
+    --carousel-gutter: 37px;
+    --carousel-gap: 4px;
+  }
+  .glass-carousel-nav { inset-inline: 0; }
+  .glass-carousel-nav .glass-nav-button svg { width: 29px; height: 29px; }
+}
+@media (max-width: 750px) {
+  .tech-carousel-navigation { top: 175px; }
+}
+@media (max-width: 500px) {
+  .tech-carousel-shell,.project-viewport-wrap,.cert-viewport-wrap {
+    --carousel-gutter: 28px;
+    --carousel-gap: 2px;
+  }
+  .tech-carousel-navigation { top: 162.5px; }
+  .glass-carousel-nav .glass-nav-button,
+  .glass-carousel-nav .tech-arrow,
+  .project-nav .glass-nav-button,
+  .cert-nav .glass-nav-button { height: 46px; }
+  .glass-carousel-nav .glass-nav-button svg,
+  .glass-carousel-nav .tech-arrow svg { width: 26px; height: 26px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .glass-carousel-nav .glass-nav-button { transition: none; }
+}

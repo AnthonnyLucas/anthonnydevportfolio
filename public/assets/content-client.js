@@ -32,10 +32,22 @@ export function applyContent(content = contentDefaults, root = document) {
   }}
   const contact = root.querySelector('#public-contact-email');
   if (contact && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.contactEmail)) contact.href=`mailto:${values.contactEmail}`;
-  // A sidebar utiliza o mesmo e-mail público configurável no painel.
+  // Gmail é um link independente, editável em Páginas & Textos > Redes sociais.
   const sidebarMail=root.querySelector('#sidebar-gmail');
-  if (sidebarMail && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.contactEmail)) {
-    sidebarMail.href=`mailto:${values.contactEmail}`;
+  if(sidebarMail){
+    let gmailHref='';
+    const configured=typeof values.gmailUrl==='string'?values.gmailUrl.trim():'';
+    if(/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(configured)) gmailHref=`mailto:${configured}`;
+    else if(/^mailto:[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(configured)) gmailHref=configured;
+    else {
+      try {
+        const link=new URL(configured);
+        if(link.protocol==='https:'&&link.hostname.toLowerCase()==='mail.google.com'&&link.pathname.startsWith('/mail')&&link.searchParams.get('to')&&!link.username&&!link.password) gmailHref=link.href;
+      } catch { /* Link de e-mail simples ou não preenchido. */ }
+    }
+    if(!gmailHref && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.contactEmail)) gmailHref=`mailto:${values.contactEmail}`;
+    if(gmailHref){sidebarMail.href=gmailHref;sidebarMail.removeAttribute('aria-disabled');sidebarMail.classList.remove('sidebar-social-icon-pending');sidebarMail.title='Enviar e-mail';}
+    else{sidebarMail.removeAttribute('href');sidebarMail.setAttribute('aria-disabled','true');sidebarMail.classList.add('sidebar-social-icon-pending');sidebarMail.title='Configure um e-mail de contato no painel';}
   }
   // Sem número real cadastrado, o ícone permanece visível, porém não é um link falso.
   const whatsapp=root.querySelector('#sidebar-whatsapp');

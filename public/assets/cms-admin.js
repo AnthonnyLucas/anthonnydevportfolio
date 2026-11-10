@@ -68,10 +68,15 @@ export function setupCmsAdmin({request,showStatus}) {
       if(spec.type==='textarea'){input=create('textarea');input.rows=4;}
       else {input=create('input');input.type=spec.type==='email'?'email':spec.type==='url'?'url':spec.type==='range'?'range':'text';}
       input.id=`cms-field-${spec.key}`;input.maxLength=spec.max;
+      if(spec.key==='gmailUrl')input.placeholder='mailto:seuemail@gmail.com ou https://mail.google.com/mail/?view=cm&fs=1&to=...';
+      if(spec.key==='whatsappUrl')input.placeholder='https://wa.me/55DDDNUMERO';
       input.value=state.content[spec.key]??spec.defaultValue;
       if(spec.type==='range'){input.min='0';input.max='100';input.step='1';input.removeAttribute('maxlength');}
       input.addEventListener('input',showCmsPreview);
       box.append(input);
+      if(spec.key==='gmailUrl'||spec.key==='whatsappUrl'){
+        box.append(create('small','form-hint',spec.key==='gmailUrl'?'Use um endereço de e-mail, um link mailto: ou um link de composição do Gmail.':'Use o link HTTPS do WhatsApp com DDI e DDD, por exemplo https://wa.me/5581999999999.'));
+      }
       if(spec.type==='image') {
         const note=create('small','form-hint','Ou envie uma nova imagem JPG, PNG, WebP ou GIF (máx. 4 MB).');
         const file=create('input');file.type='file';file.id=`cms-upload-${spec.key}`;file.accept=TYPES.join(',');

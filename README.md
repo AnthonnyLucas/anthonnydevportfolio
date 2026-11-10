@@ -1,3 +1,7 @@
+## Atualização v5.7
+
+Setas minimalistas fora dos cartões nas três vitrines e gerenciamento dos quatro ícones sociais em **Administração → Páginas & Textos → Redes sociais**. Consulte `ALTERACOES_V5_7_SETAS_E_REDES.md` para exemplos e testes.
+
 > **Versão 5.6 — Navegação em vidro e ícones de contato:** os três carrosséis públicos agora têm setas translúcidas centralizadas nas bordas laterais. Os contadores permanecem abaixo dos cartões. A sidebar inclui Gmail (usa o e-mail de contato do CMS) e WhatsApp (ative informando um link seguro do tipo `https://wa.me/55DDDNUMERO` em **Painel → Páginas & textos → Conteúdo geral**). Enquanto não houver número configurado, o ícone do WhatsApp aparece desativado. Leia `ALTERACOES_V5_6_VITRINES_CONTATO.md`.
 
 > **Atualização v5.1 — Aba Tecnologias:** leia `ALTERACOES_V5_1_TECNOLOGIAS.md` para detalhes de correções, testes e novas categorias. Os SVGs de marcas locais têm seus créditos em `ICONES_CREDITOS.md`.

@@ -17,6 +17,16 @@ export function sanitizeContent(patch) {
         catch {throw new Error(`Endereço inválido em ${spec.label}.`);}
       }
     }
+    if (spec.type === 'gmailLink' && clean) {
+      const validEmail = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(clean);
+      const validMailto = /^mailto:[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(clean);
+      let validCompose = false;
+      try {
+        const link = new URL(clean);
+        validCompose = link.protocol === 'https:' && link.hostname.toLowerCase() === 'mail.google.com' && link.pathname.startsWith('/mail') && Boolean(link.searchParams.get('to')) && !link.username && !link.password;
+      } catch { /* Link em branco ou formato mailto. */ }
+      if (!validEmail && !validMailto && !validCompose) throw new Error('Link do Gmail inválido. Informe um e-mail, mailto: ou link de composição do Gmail.');
+    }
     if (spec.type === 'email' && (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(clean) || clean.length > 254)) throw new Error('E-mail de contato inválido.');
     if (spec.type === 'range' && (!/^\d{1,3}$/.test(clean) || Number(clean) > 100)) throw new Error('Enquadramento deve estar entre 0 e 100.');
     output[key] = clean;

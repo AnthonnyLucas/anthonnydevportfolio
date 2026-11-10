@@ -7,7 +7,8 @@ export const contentGroups = [
   { id:'tecnologias', name:'Tecnologias', description:'Título e apresentação da vitrine. Os cartões são editados em sua própria aba.' },
   { id:'projetos', name:'Projetos', description:'Apresentação da galeria e textos de apoio.' },
   { id:'formacoes', name:'Formações', description:'Título, introdução e avisos da vitrine de cursos.' },
-  { id:'contato', name:'Contato', description:'Mensagens, e-mail, formulário e redes sociais.' },
+  { id:'contato', name:'Contato', description:'Mensagens, e-mail e formulário.' },
+  { id:'redes', name:'Redes sociais', description:'Links dos quatro ícones na sidebar: GitHub, LinkedIn, Gmail e WhatsApp.' },
   { id:'geral', name:'Identidade e rodapé', description:'Barra lateral, referências, metadados e mensagens finais.' }
 ];
 export const contentFields = [
@@ -91,9 +92,10 @@ export const contentFields = [
   field('topbarLocation','geral','Topo – localização','PERNAMBUCO, BR'),
   field('footerCopy','geral','Rodapé – créditos','ANTHONNY LUCAS. FEITO COM TECNOLOGIA E PROPÓSITO.'),
   field('footerVersion','geral','Rodapé – identificação','PORTFOLIO / NETLIFY'),
-  field('githubUrl','geral','Perfil GitHub','https://github.com/AnthonnyLucas','url',800),
-  field('linkedinUrl','geral','Perfil LinkedIn','https://www.linkedin.com/in/anthonny-lucas-a55596310/','url',800),
-  field('whatsappUrl','geral','WhatsApp – link (ex.: https://wa.me/55DDDNUMERO)','','url',800),
+  field('githubUrl','redes','Link do GitHub','https://github.com/AnthonnyLucas','url',800),
+  field('linkedinUrl','redes','Link do LinkedIn','https://www.linkedin.com/in/anthonny-lucas-a55596310/','url',800),
+  field('gmailUrl','redes','Gmail – link para contato (mailto:email ou link de composição do Gmail)','mailto:anthonny6613@gmail.com','gmailLink',800),
+  field('whatsappUrl','redes','WhatsApp – link (ex.: https://wa.me/55DDDNUMERO)','','url',800),
   field('metaTitle','geral','Título da aba','Anthonny Lucas — Full Stack · IoT · IA'),
   field('metaDescription','geral','Descrição para mecanismos de busca','Portfólio de Anthonny Lucas — desenvolvimento Full Stack, Inteligência Artificial, Internet das Coisas e inovação.','textarea',450)
 ];
