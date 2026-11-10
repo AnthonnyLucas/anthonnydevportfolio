@@ -1,6 +1,6 @@
 # Portfólio Anthonny Lucas — Full Stack, IoT e Inteligência Artificial
 
-**Versão:** 5.10.0  
+**Versão:** 5.11.0  
 **Autor:** Anthonny Lucas Santos da Silva  
 **Tipo:** aplicação web de portfólio com painel administrativo (CMS)  
 **Publicação prevista:** Netlify, com funções de servidor e Netlify Blobs  
@@ -32,6 +32,8 @@ O projeto também funciona como uma **base reutilizável de portfólio pessoal**
 | **Contato** | Atalhos E-mail, WhatsApp, GitHub e LinkedIn; formulário | Ajusta os links em Páginas & textos → Redes sociais; edita textos |
 | **Aparência** | Light Mode / Dark Mode, barras de rolagem e partículas animadas | Usa os dois temas também no dashboard |
 | **Identidade** | Sidebar com marca, navegação e links sociais | Ajusta título, subtítulo, logotipo, status, links e textos do rodapé |
+
+Na versão **5.11**, a área visual dos certificados também alterna entre fundos claros e escuros, preservando as imagens originais, os filtros e o carrossel.
 
 Os quatro links da seção **Contato** usam os mesmos campos de configuração da sidebar. A versão 5.10 corrige o layout quebrado da página Início introduzido pela camada de partículas: o título voltou ao primeiro bloco da grade, e a ilustração ao segundo. A seção Contato passou a oferecer também GitHub e LinkedIn, mantendo E-mail e WhatsApp.
 

@@ -36,7 +36,7 @@ test('v5.10: documentos do projeto acompanham a versão',()=>{
   const readme=read('README.md');
   const credits=read('CREDITOS_E_REUTILIZACAO.md');
   const guide=read('GUIA_FUNCIONALIDADES_E_TESTES.md');
-  assert.match(readme,/Versão:\*\* 5\.10\.0/);
+  assert.match(readme,/Versão:\*\* 5\.(?:10|11)\.0/);
   assert.match(credits,/Anthonny Lucas Santos da Silva/);
   assert.match(credits,/Atribuição obrigatória/);
   assert.match(guide,/Regressão específica v5\.10/);
