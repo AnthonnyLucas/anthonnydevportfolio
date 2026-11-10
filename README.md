@@ -114,3 +114,10 @@ O botão **Ver todas as tecnologias** amplia a lista na coluna esquerda do paine
 
 ## Ajuste v5.4 — Listas expansíveis no painel
 Ao clicar em “Ver todas as tecnologias” ou “Ver todas as formações”, as listas superiores ocupam o espaço disponível em vez de ficarem presas à altura compacta anterior. Para detalhes, veja `ALTERACOES_V5_4_EXPANSAO_LISTAS.md`.
+
+
+### Atualização 5.5 — Retorno e notificações
+- Botão **Voltar ao site** com contorno, destaque e foco acessível.
+- Depois de qualquer alteração persistida no servidor (textos, categorias, tecnologias, projetos e formações), o painel volta suavemente ao topo e exibe um aviso de sucesso.
+- Se houver erro, a página permanece na posição atual e mostra um aviso de falha; os dados não são anunciados como salvos.
+- Mensagens temporárias como “Enviando imagem” e login não provocam rolagem automática.

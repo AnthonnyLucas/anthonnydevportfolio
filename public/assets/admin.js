@@ -1,9 +1,10 @@
 import { setupCmsAdmin } from './cms-admin.js';
 import { setupCategoryAdmin } from './category-admin.js';
+import { createAdminFeedback } from './admin-feedback.js';
 const qs = selector => document.querySelector(selector);
 const state = { projects: [], certificates: [], projectShowAll:false, certShowAll:false, imageUrl: '', pendingPreview: null, certImageUrl: '', certPendingPreview: null };
 const status = qs('#admin-status');
-const showStatus = (msg, mode = '') => { status.textContent = msg; status.className = `admin-status ${mode}`; };
+const {showStatus} = createAdminFeedback({status,toast:qs('#admin-toast')});
 const showLogin = () => { qs('#login-panel').hidden = false; qs('#dashboard').hidden = true; };
 const showDashboard = () => { qs('#login-panel').hidden = true; qs('#dashboard').hidden = false; };
 const request = async (url, options = {}) => {
@@ -89,7 +90,7 @@ function renderList() {
     remove.addEventListener('click',async()=>{
       if(!confirm(`Excluir o projeto “${project.title}”? Essa ação não pode ser desfeita.`))return;
       try {showStatus('Excluindo projeto...');const result=await request('/.netlify/functions/projects',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:project.id})});
-        state.projects=result.projects||[];if(qs('#project-id').value===project.id)clearForm();renderList();showStatus('Projeto excluído.','success');
+        state.projects=result.projects||[];if(qs('#project-id').value===project.id)clearForm();renderList();showStatus('Projeto excluído.','success',{persisted:true});
       }catch(e){showStatus(e.message,'error');}
     });
     actions.append(edit,remove);row.append(content,actions);list.append(row);
@@ -172,8 +173,8 @@ qs('#project-form').addEventListener('submit',async event=>{
       image, repository:qs('#project-repo').value, demo:qs('#project-demo').value, featured:qs('#project-featured').checked };
     const data=await request('/.netlify/functions/projects',{ method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body) });
     state.projects=data.projects||[];renderList();clearForm();
-    showStatus('Projeto publicado! Abra a página pública ou atualize o site para visualizar.','success');
-  }catch(err){showStatus(err.message||'Falha ao salvar.','error');}
+    showStatus('Projeto salvo com sucesso! Abra a página pública para visualizar.','success',{persisted:true});
+  }catch(err){showStatus(err.message||'Falha ao salvar.','error',{failed:true});}
   finally{save.disabled=false;}
 });
 
@@ -238,7 +239,7 @@ function renderCertList() {
     remove.addEventListener('click',async()=>{
       if(!confirm(`Excluir a formação “${course.name}”?`))return;
       try{showStatus('Excluindo formação...');const result=await request('/.netlify/functions/certificates',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:course.id})});
-        state.certificates=result.certificates||[];if(certField('id').value===course.id)resetCertForm();renderCertList();showStatus('Formação excluída.','success');
+        state.certificates=result.certificates||[];if(certField('id').value===course.id)resetCertForm();renderCertList();showStatus('Formação excluída.','success',{persisted:true});
       }catch(error){showStatus(error.message,'error');}
     });
     actions.append(edit,remove);row.append(content,actions);list.append(row);
@@ -307,8 +308,8 @@ qs('#certificate-form').addEventListener('submit',async event=>{
       groupId:certField('group').value,type:certField('type').value,description:certField('desc').value,image};
     const result=await request('/.netlify/functions/certificates',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     state.certificates=result.certificates||[];renderCertList();resetCertForm();
-    showStatus('Formação salva! Atualize a página pública para visualizar.','success');
-  } catch(error){showStatus(error.message || 'Não foi possível salvar a formação.','error');}
+    showStatus('Formação salva com sucesso! Atualize a página pública para visualizar.','success',{persisted:true});
+  } catch(error){showStatus(error.message || 'Não foi possível salvar a formação.','error',{failed:true});}
   finally{submit.disabled=false;}
 });
 init();

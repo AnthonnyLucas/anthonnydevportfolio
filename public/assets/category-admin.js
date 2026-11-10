@@ -52,9 +52,9 @@ export function setupCategoryAdmin({request,showStatus,onUpdate=()=>{}}){
     try{
       const result=await request(`/.netlify/functions/categories?kind=${kind}`,{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
       state[kind]=result.categories||[];render();
-      showStatus('Categorias atualizadas no site público.','success');
+      showStatus('Categorias atualizadas no site público.','success',{persisted:true});
       return true;
-    }catch(error){showStatus(error.message,'error');return false;}
+    }catch(error){showStatus(error.message,'error',{failed:true});return false;}
   }
   for(const [kind,prefix] of [['projects','project'],['certificates','cert']]){
     const input=$(`#${prefix}-category-name`);

@@ -108,8 +108,8 @@ export function setupCmsAdmin({request,showStatus}) {
       showStatus('Salvando os textos e as imagens no servidor...');
       const result=await request('/.netlify/functions/content',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({revision:state.revision,patch})});
       state.content=result.content;state.revision=result.revision;
-      renderContentGroup();showStatus('Conteúdo salvo! O site público mostrará as mudanças após recarregar.','success');
-    }catch(error){showStatus(error.message||'Erro ao salvar conteúdo.','error');}
+      renderContentGroup();showStatus('Conteúdo salvo com sucesso! O site público mostrará as mudanças após recarregar.','success',{persisted:true});
+    }catch(error){showStatus(error.message||'Erro ao salvar conteúdo.','error',{failed:true});}
     finally{button.disabled=false;}
   });
   $('#restore-content').addEventListener('click',()=>{renderContentGroup();showStatus('Edições locais descartadas.');});
@@ -196,8 +196,8 @@ export function setupCmsAdmin({request,showStatus}) {
         const commit=async()=>{
           const label=field.value.trim();if(!label||label===cat.label){renderTechCategoryManager();return;}
           save.disabled=true;
-          try {await saveTechCategory({id:cat.id,label});showStatus('Categoria renomeada. Filtros sincronizados.','success');}
-          catch(error){showStatus(error.message||'Falha ao renomear categoria.','error');save.disabled=false;}
+          try {await saveTechCategory({id:cat.id,label});showStatus('Categoria renomeada. Filtros sincronizados.','success',{persisted:true});}
+          catch(error){showStatus(error.message||'Falha ao renomear categoria.','error',{failed:true});save.disabled=false;}
         };
         save.addEventListener('click',commit);
         field.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();commit();}if(e.key==='Escape')renderTechCategoryManager();});
@@ -213,8 +213,8 @@ export function setupCmsAdmin({request,showStatus}) {
             method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:cat.id})
           });
           state.techCategories=result.categories||state.techCategories;
-          renderTechCategoryControls();renderTechCategoryManager();renderTechList();showStatus('Categoria excluída.','success');
-        }catch(error){showStatus(error.message||'Falha ao excluir categoria.','error');}
+          renderTechCategoryControls();renderTechCategoryManager();renderTechList();showStatus('Categoria excluída.','success',{persisted:true});
+        }catch(error){showStatus(error.message||'Falha ao excluir categoria.','error',{failed:true});}
       });
       actions.append(rename,remove);row.append(title,actions);list.append(row);
     }
@@ -227,8 +227,8 @@ export function setupCmsAdmin({request,showStatus}) {
       await saveTechCategory({label});field.value='';
       const chosen=state.techCategories.find(c=>normalizeSearch(c.label)===normalizeSearch(label));
       if(chosen)t('category').value=chosen.id;
-      showStatus(`Categoria “${label}” criada e disponível no formulário.`,'success');
-    }catch(error){showStatus(error.message||'Não foi possível criar a categoria.','error');}
+      showStatus(`Categoria “${label}” criada e disponível no formulário.`,'success',{persisted:true});
+    }catch(error){showStatus(error.message||'Não foi possível criar a categoria.','error',{failed:true});}
     finally{button.disabled=false;}
   });
   $('#technology-category-name').addEventListener('keydown',e=>{
@@ -288,8 +288,8 @@ export function setupCmsAdmin({request,showStatus}) {
             const result=await request('/.netlify/functions/technologies',{
               method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})
             });
-            state.technologies=result.technologies||[];renderTechList();showStatus('Ordem da vitrine atualizada.','success');
-          }catch(error){showStatus(error.message||'Erro ao reordenar.','error');}
+            state.technologies=result.technologies||[];renderTechList();showStatus('Ordem da vitrine atualizada.','success',{persisted:true});
+          }catch(error){showStatus(error.message||'Erro ao reordenar.','error',{failed:true});}
         });buttons.append(btn);
       }
       const edit=create('button','','Editar');edit.type='button';edit.addEventListener('click',()=>editTech(item));
@@ -301,8 +301,8 @@ export function setupCmsAdmin({request,showStatus}) {
           });
           state.technologies=result.technologies||[];
           renderTechList();renderTechCategoryManager();
-          if(t('id').value===item.id)clearTech();showStatus('Tecnologia removida.','success');
-        }catch(error){showStatus(error.message||'Erro ao excluir tecnologia.','error');}
+          if(t('id').value===item.id)clearTech();showStatus('Tecnologia removida.','success',{persisted:true});
+        }catch(error){showStatus(error.message||'Erro ao excluir tecnologia.','error',{failed:true});}
       });
       buttons.append(edit,del);row.append(content,buttons);list.append(row);
     });
@@ -332,8 +332,8 @@ export function setupCmsAdmin({request,showStatus}) {
       });
       state.technologies=result.technologies||[];state.techLoadError='';
       renderTechList();renderTechCategoryManager();clearTech();
-      showStatus('Tecnologia salva e disponível na vitrine pública.','success');
-    }catch(error){showStatus(error.message||'Erro ao salvar tecnologia.','error');}
+      showStatus('Tecnologia salva com sucesso e disponível na vitrine pública.','success',{persisted:true});
+    }catch(error){showStatus(error.message||'Erro ao salvar tecnologia.','error',{failed:true});}
     finally{btn.disabled=false;}
   });
   renderContentGroup();
