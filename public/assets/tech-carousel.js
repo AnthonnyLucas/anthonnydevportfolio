@@ -89,7 +89,7 @@ export function setupTechCarousel() {
     const wrap=document.createElement('span');
     wrap.className='tech-logo-wrap';
     const mark=brandMarks[skill.label];
-    const external = typeof skill.logoUrl === 'string' && (skill.logoUrl==='/assets/tech-logos/assembly.svg' || skill.logoUrl.startsWith('https://') || /^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(skill.logoUrl)) ? skill.logoUrl : '';
+    const external = typeof skill.logoUrl === 'string' && (skill.logoUrl==='/assets/tech-logos/assembly.svg' || /^\/assets\/tech-icon-library\/[a-z0-9-]+\.svg$/.test(skill.logoUrl) || skill.logoUrl.startsWith('https://') || /^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(skill.logoUrl)) ? skill.logoUrl : '';
     const slug = {'C++':'cpp','C#':'csharp'}[skill.label] || skill.label.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
     const fallback = `/assets/tech-logos/${slug}.svg`;
     if (!external && !mark) {
@@ -183,21 +183,47 @@ export function setupTechCarousel() {
   }, true);
   stage.addEventListener('pointercancel',()=>{pointer=null;gestureConsumed=false;});
   stage.addEventListener('dragstart',e=>e.preventDefault());
-  // Keep the currently filtered selection when possible; a new category starts with its first card.
-  document.querySelectorAll('[data-stack]').forEach(button => button.addEventListener('click', () => {
-    const filter = button.dataset.stack;
-    selectedFilter = filter;
-    document.querySelectorAll('[data-stack]').forEach(peer => {
-      const selected = peer === button;
-      peer.classList.toggle('active', selected);
-      peer.setAttribute('aria-pressed', String(selected));
+  // Filtragem delegada para aceitar novas categorias criadas pelo painel.
+  const filterContainer=document.querySelector('.stack-filters');
+  filterContainer?.addEventListener('click',event=>{
+    const button=event.target.closest('[data-stack]');
+    if(!button || !filterContainer.contains(button))return;
+    selectedFilter=button.dataset.stack;
+    filterContainer.querySelectorAll('[data-stack]').forEach(peer=>{
+      const selected=peer===button;
+      peer.classList.toggle('active',selected);
+      peer.setAttribute('aria-pressed',String(selected));
     });
-    filteredSkills = sourceSkills.filter(item => filter==='all' || item.cat===filter);
-    active=0;
-    render();
-  }));
+    filteredSkills=sourceSkills.filter(item=>selectedFilter==='all'||item.cat===selectedFilter);
+    active=0;render();
+  });
+  function updateCategories(categories){
+    if(!Array.isArray(categories)||!filterContainer)return;
+    const oldSelection=selectedFilter;
+    // Preserva as etiquetas do HTML base (inclusive o texto editável "Todas").
+    const all=filterContainer.querySelector('[data-stack="all"]');
+    filterContainer.replaceChildren();
+    if(all)filterContainer.append(all);
+    for(const cat of categories){
+      if(!cat || typeof cat.id!=='string' || typeof cat.label!=='string')continue;
+      const button=document.createElement('button');button.type='button';button.className='filter-chip';
+      button.dataset.stack=cat.id;button.setAttribute('aria-pressed','false');
+      const label=document.createElement('span');label.textContent=cat.label;button.append(label);
+      filterContainer.append(button);
+      cats[cat.id]=cat.label.toLocaleUpperCase('pt-BR');
+    }
+    selectedFilter=selectedFilter==='all'||categories.some(c=>c.id===oldSelection)?oldSelection:'all';
+    filterContainer.querySelectorAll('[data-stack]').forEach(button=>{
+      const isCurrent=button.dataset.stack===selectedFilter;
+      button.classList.toggle('active',isCurrent);
+      button.setAttribute('aria-pressed',String(isCurrent));
+    });
+    filteredSkills=sourceSkills.filter(item=>selectedFilter==='all'||item.cat===selectedFilter);
+    active=0;render();
+  }
   render();
   return {
+    setCategories:updateCategories,
     setSkills(nextSkills) {
       if (!Array.isArray(nextSkills)) return;
       sourceSkills=nextSkills.filter(item=>item && typeof item.label==='string' && typeof item.cat==='string');

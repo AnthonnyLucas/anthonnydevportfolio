@@ -71,3 +71,34 @@
 .sidebar .brand-mark #sidebar-brand-glyph{color:var(--text)}
 .sidebar .brand-mark .brand-dot{color:var(--green)}
 @media(max-width:930px){.admin-body #projects-panel>.admin-list,.admin-body #technologies-panel>.admin-list,.admin-body #certificates-panel>.admin-list{height:auto;min-height:0}}
+
+/* v5.1 — somente aba Tecnologias: alturas sincronizadas e lista útil */
+@media(min-width:931px){
+  .admin-body #technologies-panel{align-items:start}
+  .admin-body #technologies-panel>.admin-list{height:var(--tech-editor-height,1100px);max-height:var(--tech-editor-height,1100px);min-height:0;overflow:hidden;display:flex;flex-direction:column}
+  .admin-body #technologies-panel #admin-tech-list{flex:1 1 0;min-height:0;max-height:none;height:auto;overflow-y:auto}
+}
+@media(max-width:930px){
+  .admin-body #technologies-panel>.admin-list{height:min(780px,90vh);min-height:440px;max-height:none;display:flex;flex-direction:column;overflow:hidden}
+  .admin-body #technologies-panel #admin-tech-list{height:auto;max-height:none;min-height:0;flex:1 1 0;overflow-y:auto}
+}
+#technologies-panel .tech-category-manager{flex:0 0 auto;max-height:220px}
+#technologies-panel .tech-category-manager[open]{overflow-y:auto}
+#technologies-panel .tech-item-actions{flex-wrap:wrap;justify-content:flex-end;max-width:190px}
+#technologies-panel #tech-list-summary{line-height:1.55}
+#technologies-panel .admin-list-item{align-items:center;min-height:66px}
+#technologies-panel .admin-list-item .tech-item-badge{display:inline-block;margin-top:6px;border-radius:100px;border:1px solid var(--line);padding:2px 8px;font-size:10px;color:var(--muted)}
+#technologies-panel .catalog-logo-choice{position:relative;cursor:pointer}
+#technologies-panel .catalog-logo-choice[aria-pressed="true"]{background:color-mix(in srgb,var(--green) 12%,var(--panel));box-shadow:inset 0 0 0 1px var(--green)}
+#technologies-panel .catalog-logo-fallback{height:32px;width:34px;display:grid;place-items:center;border-radius:8px;background:color-mix(in srgb,var(--green) 9%,var(--bg2));color:var(--green)}
+#technologies-panel .catalog-logo-choice img{position:absolute;top:9px;left:50%;transform:translateX(-50%);background:var(--panel);border-radius:4px}
+#technologies-panel .tech-category-manager button{cursor:pointer}
+#technologies-panel .category-manage-row input{min-width:0;flex:1;border-radius:8px;padding:8px;border:1px solid var(--line);background:var(--bg2);color:var(--text)}
+#technologies-panel .category-manage-row .list-actions{flex-wrap:wrap;justify-content:flex-end}
+#technologies-panel .tech-category-manager .category-new input{flex:1}
+
+#technologies-panel .tech-category-shortcut{margin:-2px 0 12px;align-self:flex-start;background:transparent;border:0;color:var(--green);padding:4px 0;font:600 11px var(--font);text-decoration:underline;text-underline-offset:4px;cursor:pointer}
+
+#technologies-panel .icon-catalog-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:9px 0 14px}
+#technologies-panel .icon-catalog-footer #tech-icon-count{margin:0;flex:1}
+#technologies-panel #tech-icon-more[hidden]{display:none}

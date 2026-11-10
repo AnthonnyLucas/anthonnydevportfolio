@@ -1,7 +1,7 @@
 import { getStore } from '@netlify/blobs';
 import { skills } from '../../public/assets/data.js';
 import { authError, json, sameOrigin, validSession } from './lib/security.mjs';
-const cats = ['linguagens','frameworks','infra','iot'];
+import { loadCategories, categoryId } from './lib/catalogs.mjs';
 const LIMIT = 400;
 // Cores originais preservadas para não perder a identidade individual das 25 marcas.
 const originalColors = {
@@ -17,23 +17,24 @@ const cut = (v,max) => String(v??'').trim().slice(0,max);
 function validateLogo(value) {
   const url=cut(value,800);
   if (!url) return '';
-  if (url==='/assets/tech-logos/assembly.svg') return url;
+  if (url==='/assets/tech-logos/assembly.svg' || /^\/assets\/tech-icon-library\/[a-z0-9-]+\.svg$/.test(url)) return url;
   if (/^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(url)) return url;
   try {const parsed=new URL(url);if(parsed.protocol === 'https:' && !parsed.username && !parsed.password)return parsed.href;}catch {}
   throw new Error('Logo deve ser uma URL HTTPS ou uma imagem enviada pelo painel.');
 }
-export function cleanTechnology(raw,original=null) {
+export function cleanTechnology(raw,original=null,categories=[]) {
   if(!raw || typeof raw !== 'object') throw new Error('Tecnologia inválida.');
-  const label=cut(raw.label,64), icon=cut(raw.icon,12), color=cut(raw.color,7),cat=cut(raw.cat,16);
-  if(!label || !cats.includes(cat)) throw new Error('Informe nome e categoria válidos.');
+  const label=cut(raw.label,64), icon=cut(raw.icon,12), color=cut(raw.color,7),cat=cut(raw.cat,80);
+  if(!label || !categoryId(cat,categories)) throw new Error('Informe nome e categoria válidos.');
   if(color && !/^#[0-9a-f]{6}$/i.test(color)) throw new Error('Cor deve estar no formato #RRGGBB.');
-  return {id:original?.id || crypto.randomUUID(),label,cat,icon:icon||label.slice(0,2).toUpperCase(),color:color||'#B7FF79',logoUrl:validateLogo(raw.logoUrl)};
+  return {id:original?.id || crypto.randomUUID(),label,cat:categoryId(cat,categories),icon:icon||label.slice(0,2).toUpperCase(),color:color||'#B7FF79',logoUrl:validateLogo(raw.logoUrl)};
 }
 export default async function handler(req) {
   try {
     if (!['GET','POST','DELETE','PATCH'].includes(req.method)) return json({error:'Método não permitido.'},405);
     if (req.method !== 'GET' && !validSession(req)) return authError();
     if (req.method !== 'GET' && !sameOrigin(req)) return json({error:'Origem não autorizada.'},403);
+    const categories=await loadCategories('technologies');
     const store=getStore('portfolio-technologies');
     const saved=await store.get('technologies',{type:'json'});
     const list=Array.isArray(saved) ? saved : [...seed];
@@ -56,7 +57,7 @@ export default async function handler(req) {
     const index=list.findIndex(t=>t.id===id);
     if(id && index<0)return json({error:'Tecnologia não encontrada.'},404);
     if(index<0 && list.length>=LIMIT)return json({error:'Limite de tecnologias atingido.'},400);
-    const item=cleanTechnology(data,index<0?null:list[index]);
+    const item=cleanTechnology(data,index<0?null:list[index],categories);
     if(index>=0)list[index]=item;else list.push(item);
     await store.setJSON('technologies',list);
     return json({technologies:list});

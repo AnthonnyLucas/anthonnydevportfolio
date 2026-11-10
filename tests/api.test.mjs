@@ -94,3 +94,28 @@ test('certificate categories support custom areas, renamed labels and protected 
   r=await call(certificateEndpoint,'certificates','DELETE',{id:certificate.id},{auth:true});assert.equal(r.status,200);
   r=await c('DELETE',{id},{auth:true});assert.equal(r.status,200);
 });
+
+test('technology categories: create, rename, filter ids, prevent deletion in use, persist new icons',async()=>{
+  reset();
+  const cat=(method='GET',payload=null,opts={})=>call(categoryEndpoint,'categories?kind=technologies',method,payload,opts);
+  let r=await cat();
+  assert.deepEqual(r.body.categories.map(c=>c.id),['linguagens','frameworks','infra','iot']);
+  r=await cat('POST',{label:'Sistemas Embarcados'});assert.equal(r.status,401);
+  r=await cat('POST',{label:'Sistemas Embarcados'},{auth:true});assert.equal(r.status,200);
+  const created=r.body.categories.find(c=>c.label==='Sistemas Embarcados');assert.ok(created.id);
+  r=await call(techEndpoint,'technologies','POST',{
+    label:'ESP32',cat:created.id,icon:'ESP',color:'#10ab4c',logoUrl:'/assets/tech-icon-library/python.svg'
+  },{auth:true});
+  assert.equal(r.status,200);
+  const added=r.body.technologies.find(t=>t.label==='ESP32');
+  assert.equal(added.cat,created.id);
+  assert.equal(added.logoUrl,'/assets/tech-icon-library/python.svg');
+  r=await cat('DELETE',{id:created.id},{auth:true});assert.equal(r.status,409);
+  r=await cat('POST',{id:created.id,label:'Hardware e Embarcados'},{auth:true});assert.equal(r.status,200);
+  assert.ok(r.body.categories.some(c=>c.id===created.id && c.label==='Hardware e Embarcados'));
+  r=await call(techEndpoint,'technologies');assert.equal(r.body.technologies.find(t=>t.id===added.id).cat,created.id);
+  r=await call(techEndpoint,'technologies','POST',{label:'Incorreta',cat:'area-inexistente'},{auth:true});assert.equal(r.status,400);
+  r=await call(techEndpoint,'technologies','DELETE',{id:added.id},{auth:true});assert.equal(r.status,200);
+  r=await cat('DELETE',{id:created.id},{auth:true});assert.equal(r.status,200);
+  r=await cat();assert.equal(r.body.categories.some(c=>c.id===created.id),false);
+});

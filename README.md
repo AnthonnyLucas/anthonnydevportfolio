@@ -1,3 +1,5 @@
+> **Atualização v5.1 — Aba Tecnologias:** leia `ALTERACOES_V5_1_TECNOLOGIAS.md` para detalhes de correções, testes e novas categorias. Os SVGs de marcas locais têm seus créditos em `ICONES_CREDITOS.md`.
+
 > **Atualização v5.0:** consulte [ALTERACOES_V5.md](ALTERACOES_V5.md) para catálogo de projetos, categorias múltiplas, listas pesquisáveis, ícones e sidebar editável. As mudanças da versão anterior estão em [ALTERACOES_V4.md](ALTERACOES_V4.md).
 
 # Portfólio profissional — preparado para Netlify

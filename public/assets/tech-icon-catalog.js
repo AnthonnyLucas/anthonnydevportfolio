@@ -158,36 +158,82 @@ YAML|yaml
 Yarn|yarn
 Zig|zig
 `;
+const localIcons = {
+  'Android': 'android',
+  'Angular': 'angular',
+  'AWS': 'aws',
+  'Bootstrap': 'bootstrap',
+  'Cloudflare': 'cloudflare',
+  'CSS3': 'css3-alt',
+  'Docker': 'docker',
+  'Drupal': 'drupal',
+  'Figma': 'figma',
+  'Git': 'git',
+  'GitHub': 'github',
+  'GitLab': 'gitlab',
+  'Google Cloud': 'google',
+  'HTML5': 'html5',
+  'Java': 'java',
+  'JavaScript': 'js',
+  'Laravel': 'laravel',
+  'Linux': 'linux',
+  'Node.js': 'node-js',
+  'NPM': 'npm',
+  'PHP': 'php',
+  'Python': 'python',
+  'R': 'r-project',
+  'Raspberry Pi': 'raspberry-pi',
+  'React': 'react',
+  'Rust': 'rust',
+  'Sass': 'sass',
+  'Swift': 'swift',
+  'Symfony': 'symfony',
+  'Ubuntu': 'ubuntu',
+  'Unity': 'unity',
+  'Vue.js': 'vuejs',
+  'WordPress': 'wordpress',
+  'Yarn': 'yarn',
+  'Windows': 'windows',
+  'Flutter': 'flutter',
+  'Less': 'less',
+  'Jira': 'jira',
+  'Jenkins': 'jenkins'
+};
 export const techIconCatalog=catalogText.trim().split('\n').map(line=>{
   const [name,slug]=line.split('|');
-  const url=slug==='assembly'?'/assets/tech-logos/assembly.svg':`https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${slug}/${slug}-original.svg`;
+  const url=slug==='assembly'?'/assets/tech-logos/assembly.svg':localIcons[name]?`/assets/tech-icon-library/${localIcons[name]}.svg`:`https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/${slug}/${slug}-original.svg`;
   return {name,slug,url};
 }).sort((a,b)=>a.name.localeCompare(b.name,'pt-BR'));
 export function setupIconCatalog({onSelect}){
   const input=document.querySelector('#tech-icon-search');
   const grid=document.querySelector('#tech-icon-catalog');
   const count=document.querySelector('#tech-icon-count');
+  const more=document.querySelector('#tech-icon-more');
+  let visibleCount=48;
   const selectionLabel=()=>document.querySelector('#technology-logo-url')?.value||'';
   function render(){
     const search=input.value.trim().toLocaleLowerCase('pt-BR');
     const found=techIconCatalog.filter(item=>item.name.toLocaleLowerCase('pt-BR').includes(search)||item.slug.includes(search));
     grid.replaceChildren();
-    const visible=found.slice(0,48);
+    const visible=found.slice(0,visibleCount);
     for(const item of visible){
       const button=document.createElement('button');button.type='button';button.className='catalog-logo-choice';button.title=item.name;
       button.setAttribute('aria-label',`Selecionar logotipo de ${item.name}`);
       button.setAttribute('aria-pressed',String(item.url===selectionLabel()));
+      const fallback=document.createElement('span');fallback.className='catalog-logo-fallback';fallback.textContent=item.name.slice(0,3).toUpperCase();
       const img=document.createElement('img');img.src=item.url;img.alt='';img.loading='lazy';img.decoding='async';
-      img.addEventListener('error',()=>{img.remove();const fallback=document.createElement('span');fallback.className='catalog-logo-fallback';fallback.textContent=item.name.slice(0,3).toUpperCase();button.prepend(fallback);},{once:true});
+      img.addEventListener('error',()=>{img.remove();},{once:true});
       const caption=document.createElement('small');caption.textContent=item.name;
-      button.append(img,caption);button.addEventListener('click',()=>{onSelect(item);render();});grid.append(button);
+      button.append(fallback,img,caption);button.addEventListener('click',()=>{onSelect(item);render();});grid.append(button);
     }
-    count.textContent=`${found.length} logotipo(s) encontrado(s) de ${techIconCatalog.length} opções. ${found.length>48?'Refine a busca para ver os demais.':''}`;
+    count.textContent=`Exibindo ${visible.length} de ${found.length} logotipos (${techIconCatalog.length} no catálogo).` ;
+    more.hidden=found.length<=visibleCount;
   }
-  input.addEventListener('input',render);
-  document.querySelector('#tech-icon-clear').addEventListener('click',()=>{input.value='';render();});
+  input.addEventListener('input',()=>{visibleCount=48;render();});
+  more.addEventListener('click',()=>{visibleCount+=48;render();});
+  document.querySelector('#tech-icon-clear').addEventListener('click',()=>{input.value='';visibleCount=48;render();});
   document.querySelector('#technology-name').addEventListener('input',event=>{
-    if(event.target.value.trim().length>=2){input.value=event.target.value.trim();render();}
+    if(event.target.value.trim().length>=2){input.value=event.target.value.trim();visibleCount=48;render();}
   });
   render();return {render};
 }

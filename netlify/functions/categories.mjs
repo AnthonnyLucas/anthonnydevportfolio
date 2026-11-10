@@ -20,7 +20,7 @@ export default async function handler(req){
       const records=await listCatalogRecords(kind);
       const used=records.some(item => kind==='projects'
         ? (Array.isArray(item.categories) && item.categories.some(v=>categoryId(v,list)===id) || categoryId(item.category,list)===id)
-        : categoryId(item.groupId||item.group,list)===id);
+        : kind==='technologies' ? categoryId(item.cat,list)===id : categoryId(item.groupId||item.group,list)===id);
       if(used)return json({error:'Há registros vinculados a esta categoria. Reclassifique-os antes de excluir.'},409);
       const next=list.filter(c=>c.id!==id);
       await store.setJSON(kind,next);
@@ -33,10 +33,12 @@ export default async function handler(req){
     if(id && index<0)return json({error:'Categoria não encontrada.'},404);
     if(index>=0){
       // Migra registros V4 (categorias em texto) ANTES de renomear; não perde a referência.
-      const records=await listCatalogRecords(kind);
-      const migrated=records.map(item=>kind==='projects'?expandProject(item,list):expandCertificate(item,list));
-      const originalStore=getStore(kind==='projects'?'portfolio-projects':'portfolio-certificates');
-      await originalStore.setJSON(kind==='projects'?'projects':'certificates',migrated);
+      if(kind!=='technologies'){
+        const records=await listCatalogRecords(kind);
+        const migrated=records.map(item=>kind==='projects'?expandProject(item,list):expandCertificate(item,list));
+        const originalStore=getStore(kind==='projects'?'portfolio-projects':'portfolio-certificates');
+        await originalStore.setJSON(kind==='projects'?'projects':'certificates',migrated);
+      }
       list[index]={...list[index],label};
     }
     else {

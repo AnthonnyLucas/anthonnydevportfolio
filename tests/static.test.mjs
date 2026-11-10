@@ -29,3 +29,14 @@ test('all relative imports resolve to included files',()=>{
   for(const m of text.matchAll(/from\s+['"](\.[^'"]+)['"]/g))assert.ok(existsSync(resolve(dirname(file),m[1])),`${file} -> ${m[1]}`);
  }
 });
+
+test('technologies panel has category CRUD controls, searchable logos, and aligned independent scrolling',()=>{
+  const admin=readFileSync(new URL('../public/admin/index.html',import.meta.url),'utf8');
+  const css=readFileSync(new URL('../public/assets/v5.css',import.meta.url),'utf8');
+  const cms=readFileSync(new URL('../public/assets/cms-admin.js',import.meta.url),'utf8');
+  const catalog=readFileSync(new URL('../public/assets/tech-icon-catalog.js',import.meta.url),'utf8');
+  for(const id of ['tech-search','tech-filter','technology-category-name','technology-category-add','technology-category-list','tech-category-shortcut','tech-icon-search','tech-icon-catalog','tech-icon-more'])assert.ok(admin.includes(`id="${id}"`),`missing ${id}`);
+  assert.ok(css.includes('--tech-editor-height'));
+  assert.ok(cms.includes("Promise.allSettled"));
+  assert.ok(catalog.includes('localIcons'));
+});

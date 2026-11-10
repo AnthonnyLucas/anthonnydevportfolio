@@ -122,86 +122,240 @@ export function setupCmsAdmin({request,showStatus}) {
     showStatus('Textos de referência preenchidos. Revise e clique em Salvar alterações para publicá-los.');
   });
 
-  // Editor do catálogo tecnológico: inclusão/edição/exclusão/ordenação protegidos na API.
+  // Gerenciamento isolado de tecnologias: categorias dinâmicas, busca combinada,
+  // catálogo pesquisável e lista com rolagem. Não interfere nos outros editores.
+  const defaultTechCategories=[
+    {id:'linguagens',label:'Linguagens'},
+    {id:'frameworks',label:'Frameworks'},
+    {id:'infra',label:'Infra & DevOps'},
+    {id:'iot',label:'IoT & Dados'}
+  ];
+  state.techCategories=[...defaultTechCategories];
+  state.techLoadError='';
   const t=(suffix)=>$(`#technology-${suffix}`);
-  const techPreview=(url) => {
+  const normalizeSearch=value=>String(value??'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('pt-BR').trim();
+  const categoryLabel=id=>state.techCategories.find(c=>c.id===id)?.label||id;
+  const techManager=$('#technology-category-manager');
+  const techEditor=$('.tech-editor-card');
+  function alignTechColumns(){
+    // O editor determina a altura disponível para a lista à esquerda.
+    if(window.matchMedia('(min-width: 931px)').matches){
+      const h=Math.ceil(techEditor.getBoundingClientRect().height);
+      if(h>0)$('#technologies-panel').style.setProperty('--tech-editor-height',`${h}px`);
+    } else $('#technologies-panel').style.removeProperty('--tech-editor-height');
+  }
+  if(typeof ResizeObserver!=='undefined')new ResizeObserver(alignTechColumns).observe(techEditor);
+  window.addEventListener('resize',alignTechColumns,{passive:true});
+
+  const techPreview=url=>{
     const panel=$('#technology-image-preview');panel.replaceChildren();
-    if(safePreview(url) || url==='/assets/tech-logos/assembly.svg') {const img=create('img');img.src=url;img.alt='Prévia do ícone';panel.append(img);}
-    else panel.append(create('span','', 'Será usado o símbolo de reserva ou o logotipo Devicon.'));
+    if(safePreview(url) || url==='/assets/tech-logos/assembly.svg' || /^\/assets\/tech-icon-library\/[a-z0-9-]+\.svg$/.test(url) || (url?.startsWith('blob:') && url===state.techImageObjectUrl)){
+      const img=create('img');img.src=url;img.alt='Prévia do logotipo selecionado';
+      img.addEventListener('error',()=>{panel.replaceChildren(create('span','','Logotipo indisponível. Escolha outro ou use o símbolo de reserva.'));},{once:true});
+      panel.append(img);
+    }else panel.append(create('span','','Selecione um logotipo ou informe um símbolo de reserva.'));
   };
-  const iconCatalog=setupIconCatalog({onSelect:item=>{t('logo-url').value=item.url;state.techLogo=item.url;t('icon').value=item.name==='Assembly'?'ASM':item.name.slice(0,3).toUpperCase();techPreview(item.url);}});
+  const iconCatalog=setupIconCatalog({onSelect:item=>{
+    t('logo-url').value=item.url;state.techLogo=item.url;
+    t('icon').value=item.name==='Assembly'?'ASM':item.name.slice(0,3).toUpperCase();
+    techPreview(item.url);
+    showStatus(`Logotipo de ${item.name} selecionado. Clique em Salvar tecnologia para publicar.`,'success');
+  }});
+  function renderTechCategoryControls(){
+    const edit=t('category'),filter=$('#tech-filter');
+    const chosenEdit=edit.value,chosenFilter=filter.value;
+    edit.replaceChildren();filter.replaceChildren();
+    const all=create('option','','Todas as áreas');all.value='all';filter.append(all);
+    for(const c of state.techCategories){
+      const e=create('option','',c.label);e.value=c.id;edit.append(e);
+      const f=create('option','',c.label);f.value=c.id;filter.append(f);
+    }
+    if(state.techCategories.some(c=>c.id===chosenEdit))edit.value=chosenEdit;
+    if(state.techCategories.some(c=>c.id===chosenFilter))filter.value=chosenFilter;
+    else filter.value='all';
+  }
+  async function saveTechCategory(payload){
+    const result=await request('/.netlify/functions/categories?kind=technologies',{
+      method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)
+    });
+    state.techCategories=result.categories||state.techCategories;
+    renderTechCategoryControls();renderTechCategoryManager();renderTechList();
+  }
+  function renderTechCategoryManager(){
+    const list=$('#technology-category-list');list.replaceChildren();
+    for(const cat of state.techCategories){
+      const row=create('div','category-manage-row');
+      const title=create('span','',cat.label);
+      const actions=create('div','list-actions');
+      const rename=create('button','','Renomear');rename.type='button';
+      rename.addEventListener('click',()=>{
+        const field=create('input');field.maxLength=55;field.value=cat.label;field.setAttribute('aria-label',`Novo nome de ${cat.label}`);
+        const save=create('button','','Salvar');save.type='button';
+        const cancel=create('button','','Cancelar');cancel.type='button';
+        row.replaceChildren(field);const controls=create('div','list-actions');controls.append(save,cancel);row.append(controls);field.focus();field.select();
+        const commit=async()=>{
+          const label=field.value.trim();if(!label||label===cat.label){renderTechCategoryManager();return;}
+          save.disabled=true;
+          try {await saveTechCategory({id:cat.id,label});showStatus('Categoria renomeada. Filtros sincronizados.','success');}
+          catch(error){showStatus(error.message||'Falha ao renomear categoria.','error');save.disabled=false;}
+        };
+        save.addEventListener('click',commit);
+        field.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();commit();}if(e.key==='Escape')renderTechCategoryManager();});
+        cancel.addEventListener('click',renderTechCategoryManager);
+      });
+      const remove=create('button','delete','Excluir');remove.type='button';
+      const used=state.technologies.some(item=>item.cat===cat.id);
+      remove.disabled=used;remove.title=used?'Há tecnologias nesta categoria. Reclassifique-as antes de excluir.':'Excluir categoria';
+      remove.addEventListener('click',async()=>{
+        if(!confirm(`Excluir a categoria “${cat.label}”?`))return;
+        try{
+          const result=await request('/.netlify/functions/categories?kind=technologies',{
+            method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:cat.id})
+          });
+          state.techCategories=result.categories||state.techCategories;
+          renderTechCategoryControls();renderTechCategoryManager();renderTechList();showStatus('Categoria excluída.','success');
+        }catch(error){showStatus(error.message||'Falha ao excluir categoria.','error');}
+      });
+      actions.append(rename,remove);row.append(title,actions);list.append(row);
+    }
+  }
+  $('#technology-category-add').addEventListener('click',async()=>{
+    const field=$('#technology-category-name'),label=field.value.trim();
+    if(label.length<2){showStatus('Informe uma categoria com pelo menos dois caracteres.','error');field.focus();return;}
+    const button=$('#technology-category-add');button.disabled=true;
+    try{
+      await saveTechCategory({label});field.value='';
+      const chosen=state.techCategories.find(c=>normalizeSearch(c.label)===normalizeSearch(label));
+      if(chosen)t('category').value=chosen.id;
+      showStatus(`Categoria “${label}” criada e disponível no formulário.`,'success');
+    }catch(error){showStatus(error.message||'Não foi possível criar a categoria.','error');}
+    finally{button.disabled=false;}
+  });
+  $('#technology-category-name').addEventListener('keydown',e=>{
+    if(e.key==='Enter'){e.preventDefault();$('#technology-category-add').click();}
+  });
+  $('#tech-category-shortcut').addEventListener('click',()=>{
+    techManager.open=true;techManager.scrollIntoView({behavior:'smooth',block:'nearest'});
+    $('#technology-category-name').focus();
+  });
   const clearTech=()=>{
     $('#technology-form').reset();t('id').value='';t('color').value='#b7ff79';
-    $('#tech-editor-title').textContent='Nova tecnologia';state.techLogo='';releaseImage('techImageObjectUrl');techPreview('');iconCatalog.render();
+    $('#tech-editor-title').textContent='Nova tecnologia';state.techLogo='';
+    releaseImage('techImageObjectUrl');techPreview('');iconCatalog.render();
   };
   function editTech(item){
-    clearTech();t('id').value=item.id;t('name').value=item.label;t('category').value=item.cat;
+    clearTech();t('id').value=item.id;t('name').value=item.label;
+    t('category').value=item.cat;
     t('icon').value=item.icon||'';t('color').value=item.color||'#b7ff79';
-    t('logo-url').value=item.logoUrl||'';state.techLogo=item.logoUrl||'';techPreview(state.techLogo);
-    iconCatalog.render();$('#tech-editor-title').textContent='Editar tecnologia';t('name').focus();$('.tech-editor-card').scrollIntoView({behavior:'smooth',block:'start'});
+    t('logo-url').value=item.logoUrl||'';state.techLogo=item.logoUrl||'';
+    techPreview(state.techLogo);iconCatalog.render();
+    $('#tech-editor-title').textContent='Editar tecnologia';t('name').focus();
+    techEditor.scrollIntoView({behavior:'smooth',block:'nearest'});
   }
   function renderTechList(){
     const list=$('#admin-tech-list');list.replaceChildren();
-    const query=$('#tech-search').value.trim().toLocaleLowerCase('pt-BR');
+    const query=normalizeSearch($('#tech-search').value);
     const category=$('#tech-filter').value;
-    const matches=state.technologies.filter(t=>t.label.toLocaleLowerCase('pt-BR').includes(query) && (category==='all'||t.cat===category));
-    const shown=state.techShowAll?matches:matches.slice(0,6);
-    $('#tech-list-summary').textContent=`${shown.length} de ${matches.length} resultados`;
-    $('#tech-show-all').hidden=matches.length<=6;
-    $('#tech-show-all').textContent=state.techShowAll?'Mostrar menos':'Ver todas as tecnologias';
-    if(!matches.length){list.append(create('p','list-empty','Nenhuma tecnologia nesta vitrine.'));return;}
+    const matches=state.technologies.filter(item=>normalizeSearch(item.label).includes(query) && (category==='all'||item.cat===category));
+    // Pesquisas sempre mostram todos os resultados, sem um corte escondido.
+    const limit=18;
+    const all=state.techShowAll||Boolean(query)||category!=='all';
+    const shown=all?matches:matches.slice(0,limit);
+    $('#tech-list-summary').textContent=state.techLoadError||`${shown.length} de ${matches.length} tecnologia(s) · ${state.technologies.length} cadastradas`;
+    $('#tech-show-all').hidden=matches.length<=limit||Boolean(query)||category!=='all';
+    $('#tech-show-all').textContent=state.techShowAll?'Mostrar as primeiras 18':'Ver todas as tecnologias';
+    if(!matches.length){
+      list.append(create('p','list-empty',state.techLoadError || (query||category!=='all'?'Nenhuma tecnologia corresponde à pesquisa.':'Nenhuma tecnologia cadastrada.')));
+      return;
+    }
     shown.forEach(item=>{
-      const i=state.technologies.findIndex(t=>t.id===item.id);
+      const i=state.technologies.findIndex(row=>row.id===item.id);
       const row=create('article','admin-list-item');
-      const content=create('div');content.append(create('h3','',item.label),create('p','',`${item.cat} · ${i+1}/${state.technologies.length}`));
+      const content=create('div');content.append(create('h3','',item.label));
+      const badge=create('span','tech-item-badge',categoryLabel(item.cat));content.append(badge);
       const buttons=create('div','list-actions tech-item-actions');
-      for (const [label,action,title] of [['↑','up','Mover para cima'],['↓','down','Mover para baixo']]){
-        const btn=create('button','',label);btn.type='button';btn.title=title;btn.disabled=action==='up'?i===0:i===state.technologies.length-1;
+      for(const [label,offset,title] of [['↑',-1,'Mover para cima'],['↓',1,'Mover para baixo']]){
+        const btn=create('button','',label);btn.type='button';btn.title=title;
+        btn.disabled=i+offset<0||i+offset>=state.technologies.length;
         btn.addEventListener('click',async()=>{
-          const ids=state.technologies.map(t=>t.id);const other=i+(action==='up'?-1:1);
-          [ids[i],ids[other]]=[ids[other],ids[i]];
-          try {const result=await request('/.netlify/functions/technologies',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})});state.technologies=result.technologies;renderTechList();showStatus('Ordem da vitrine atualizada.','success');}
-          catch(err){showStatus(err.message,'error');}
+          const ids=state.technologies.map(row=>row.id);
+          [ids[i],ids[i+offset]]=[ids[i+offset],ids[i]];
+          try{
+            const result=await request('/.netlify/functions/technologies',{
+              method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({ids})
+            });
+            state.technologies=result.technologies||[];renderTechList();showStatus('Ordem da vitrine atualizada.','success');
+          }catch(error){showStatus(error.message||'Erro ao reordenar.','error');}
         });buttons.append(btn);
       }
       const edit=create('button','','Editar');edit.type='button';edit.addEventListener('click',()=>editTech(item));
       const del=create('button','delete','Excluir');del.type='button';del.addEventListener('click',async()=>{
         if(!confirm(`Excluir “${item.label}” da vitrine?`))return;
-        try {const result=await request('/.netlify/functions/technologies',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:item.id})});state.technologies=result.technologies;renderTechList();if(t('id').value===item.id)clearTech();showStatus('Tecnologia removida.','success');}
-        catch(err){showStatus(err.message,'error');}
-      });buttons.append(edit,del);row.append(content,buttons);list.append(row);
+        try{
+          const result=await request('/.netlify/functions/technologies',{
+            method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:item.id})
+          });
+          state.technologies=result.technologies||[];
+          renderTechList();renderTechCategoryManager();
+          if(t('id').value===item.id)clearTech();showStatus('Tecnologia removida.','success');
+        }catch(error){showStatus(error.message||'Erro ao excluir tecnologia.','error');}
+      });
+      buttons.append(edit,del);row.append(content,buttons);list.append(row);
     });
   }
   $('#tech-search').addEventListener('input',()=>{state.techShowAll=false;renderTechList();});
   $('#tech-filter').addEventListener('change',()=>{state.techShowAll=false;renderTechList();});
   $('#tech-show-all').addEventListener('click',()=>{state.techShowAll=!state.techShowAll;renderTechList();});
   t('logo').addEventListener('change',()=>{
-    releaseImage('techImageObjectUrl');
-    const file=t('logo').files?.[0];if(!file){techPreview(state.techLogo);return;}
+    releaseImage('techImageObjectUrl');const file=t('logo').files?.[0];
+    if(!file){techPreview(state.techLogo);return;}
     if(!TYPES.includes(file.type)||file.size>MAX_IMAGE){showStatus('Imagem inválida (máximo 4 MB).','error');t('logo').value='';return;}
     state.techImageObjectUrl=URL.createObjectURL(file);techPreview(state.techImageObjectUrl);
   });
-  t('logo-url').addEventListener('change',()=>{if(!t('logo').files?.length){state.techLogo=t('logo-url').value.trim();techPreview(state.techLogo);}});
-  $('#new-technology').addEventListener('click',()=>{clearTech();t('name').focus();$('.tech-editor-card').scrollIntoView({behavior:'smooth',block:'start'});});
+  t('logo-url').addEventListener('change',()=>{
+    if(!t('logo').files?.length){state.techLogo=t('logo-url').value.trim();techPreview(state.techLogo);iconCatalog.render();}
+  });
+  $('#new-technology').addEventListener('click',()=>{clearTech();t('name').focus();techEditor.scrollIntoView({behavior:'smooth',block:'nearest'});});
   $('#clear-technology').addEventListener('click',clearTech);
   $('#technology-form').addEventListener('submit',async e=>{
     e.preventDefault();const btn=$('#save-technology');btn.disabled=true;
-    try {
+    try{
       let logoUrl=t('logo-url').value.trim()||state.techLogo;
       const file=t('logo').files?.[0];if(file){showStatus('Enviando logotipo...');logoUrl=await upload(file);}
       const body={id:t('id').value||undefined,label:t('name').value,cat:t('category').value,icon:t('icon').value,color:t('color').value,logoUrl};
-      const result=await request('/.netlify/functions/technologies',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
-      state.technologies=result.technologies;renderTechList();clearTech();showStatus('Tecnologia salva e disponível na vitrine pública.','success');
+      const result=await request('/.netlify/functions/technologies',{
+        method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)
+      });
+      state.technologies=result.technologies||[];state.techLoadError='';
+      renderTechList();renderTechCategoryManager();clearTech();
+      showStatus('Tecnologia salva e disponível na vitrine pública.','success');
     }catch(error){showStatus(error.message||'Erro ao salvar tecnologia.','error');}
     finally{btn.disabled=false;}
   });
   renderContentGroup();
   return {
     async refresh(){
-      const [content,tech]=await Promise.all([request('/.netlify/functions/content'),request('/.netlify/functions/technologies')]);
-      state.content={...contentDefaults,...content.content};state.revision=content.revision||0;
-      state.technologies=tech.technologies||[];
-      renderContentGroup();renderTechList();
+      // Uma falha no conteúdo ou nas categorias não desabilita a busca de tecnologias.
+      const results=await Promise.allSettled([
+        request('/.netlify/functions/content'),
+        request('/.netlify/functions/technologies'),
+        request('/.netlify/functions/categories?kind=technologies')
+      ]);
+      if(results[0].status==='fulfilled'){
+        const content=results[0].value;
+        state.content={...contentDefaults,...content.content};state.revision=content.revision||0;
+        renderContentGroup();
+      }
+      if(results[1].status==='fulfilled'){
+        state.technologies=results[1].value.technologies||[];state.techLoadError='';
+      }else{
+        state.techLoadError='Não foi possível carregar as tecnologias. Confira a API da Netlify.';
+      }
+      if(results[2].status==='fulfilled')state.techCategories=results[2].value.categories||defaultTechCategories;
+      renderTechCategoryControls();renderTechCategoryManager();renderTechList();iconCatalog.render();
+      alignTechColumns();
+      const errors=results.map((r,i)=>r.status==='rejected'?['Conteúdo','Tecnologias','Categorias de tecnologias'][i]+': '+r.reason.message:null).filter(Boolean);
+      if(errors.length)showStatus('Falha no carregamento: '+errors.join(' | '),'error');
     }
   };
 }

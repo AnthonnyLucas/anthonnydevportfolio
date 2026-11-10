@@ -52,12 +52,24 @@ sections.forEach(section => navObserver.observe(section));
 
 const techCarousel = setupTechCarousel();
 async function loadTechnologies() {
+  // As categorias são independentes; se uma função estiver indisponível,
+  // a vitrine original ainda funciona sem esconder os cartões existentes.
+  const jobs=await Promise.allSettled([
+    fetch('/.netlify/functions/technologies',{cache:'no-store'}),
+    fetch('/.netlify/functions/categories?kind=technologies',{cache:'no-store'})
+  ]);
   try {
-    const result = await fetch('/.netlify/functions/technologies', {cache:'no-store'});
-    if (!result.ok || !(result.headers.get('content-type')||'').includes('application/json')) return;
-    const body=await result.json();
-    if (Array.isArray(body.technologies)) techCarousel?.setSkills(body.technologies);
-  } catch { /* Mantém a vitrine original na prévia estática. */ }
+    if(jobs[0].status==='fulfilled' && jobs[0].value.ok && (jobs[0].value.headers.get('content-type')||'').includes('application/json')){
+      const data=await jobs[0].value.json();
+      if(Array.isArray(data.technologies))techCarousel?.setSkills(data.technologies);
+    }
+  }catch { /* Fallback estático preservado. */ }
+  try {
+    if(jobs[1].status==='fulfilled' && jobs[1].value.ok && (jobs[1].value.headers.get('content-type')||'').includes('application/json')){
+      const data=await jobs[1].value.json();
+      if(Array.isArray(data.categories))techCarousel?.setCategories(data.categories);
+    }
+  }catch { /* Filtros originais preservados. */ }
 }
 loadTechnologies();
 loadSiteContent();

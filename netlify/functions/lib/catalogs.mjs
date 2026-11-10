@@ -8,8 +8,14 @@ export const projectSeeds = [
 ];
 const slug = value => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,55);
 export const certificateSeeds = certificateCategories.filter(v=>v!=='Todas').map(label=>({id:slug(label),label}));
-export const allowedKinds = ['projects','certificates'];
-export const defaultsFor = kind => kind==='projects' ? projectSeeds : certificateSeeds;
+export const technologySeeds = [
+  {id:'linguagens',label:'Linguagens'},
+  {id:'frameworks',label:'Frameworks'},
+  {id:'infra',label:'Infra & DevOps'},
+  {id:'iot',label:'IoT & Dados'}
+];
+export const allowedKinds = ['projects','certificates','technologies'];
+export const defaultsFor = kind => kind==='projects' ? projectSeeds : kind==='technologies' ? technologySeeds : certificateSeeds;
 export async function loadCategories(kind) {
   if(!allowedKinds.includes(kind)) throw new Error('Catálogo inválido.');
   const store=getStore('portfolio-category-catalogs');
@@ -35,7 +41,11 @@ export function expandCertificate(certificate,list) {
   return {...certificate,groupId:id || '',group:list.find(c=>c.id===id)?.label || certificate.group || 'Outros'};
 }
 export async function listCatalogRecords(kind) {
-  const store=getStore(kind==='projects'?'portfolio-projects':'portfolio-certificates');
-  const saved=await store.get(kind==='projects'?'projects':'certificates',{type:'json'});
-  return Array.isArray(saved) ? saved : kind==='projects'?showcaseProjects:certificates;
+  const storeName=kind==='projects'?'portfolio-projects':kind==='technologies'?'portfolio-technologies':'portfolio-certificates';
+  const key=kind==='technologies'?'technologies':kind;
+  const store=getStore(storeName);
+  const saved=await store.get(key,{type:'json'});
+  if(Array.isArray(saved))return saved;
+  if(kind==='technologies')return (await import('../../../public/assets/data.js')).skills;
+  return kind==='projects'?showcaseProjects:certificates;
 }
