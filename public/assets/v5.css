@@ -102,3 +102,72 @@
 #technologies-panel .icon-catalog-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:9px 0 14px}
 #technologies-panel .icon-catalog-footer #tech-icon-count{margin:0;flex:1}
 #technologies-panel #tech-icon-more[hidden]{display:none}
+
+
+/* v5.2 — Só Tecnologias: expandir a lista dentro do limite do editor.
+   Não altera as dimensões ou a rolagem das abas Projetos e Formações. */
+@media (min-width: 931px) {
+  .admin-body #technologies-panel:not(.tech-list-expanded) #admin-tech-list {
+    flex: 0 0 auto;
+    height: clamp(260px, 38vh, 410px);
+    min-height: 0;
+    max-height: 410px;
+  }
+  .admin-body #technologies-panel.tech-list-expanded #admin-tech-list {
+    flex: 1 1 0;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+  /* Reserva o rodapé e o gerenciador de categorias, sem ultrapassar o editor. */
+  .admin-body #technologies-panel.tech-list-expanded > .admin-list {
+    display: flex;
+    flex-direction: column;
+    height: var(--tech-editor-height, 1100px);
+    max-height: var(--tech-editor-height, 1100px);
+    min-height: 0;
+    overflow: hidden;
+  }
+  .admin-body #technologies-panel.tech-list-expanded .tech-category-manager[open] {
+    flex: 0 0 auto;
+    max-height: clamp(220px, 26vh, 310px);
+    overflow-y: auto;
+  }
+}
+@media (max-width: 930px) {
+  /* No mobile as colunas são empilhadas: expandir a altura ao clicar sem cortar categorias. */
+  .admin-body #technologies-panel:not(.tech-list-expanded) > .admin-list {
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+  }
+  .admin-body #technologies-panel.tech-list-expanded > .admin-list {
+    height: min(1050px, calc(100dvh + 260px));
+    min-height: 860px;
+    max-height: none;
+    overflow: hidden;
+  }
+  .admin-body #technologies-panel:not(.tech-list-expanded) #admin-tech-list {
+    flex: 0 0 auto;
+    height: clamp(180px, 32vh, 310px);
+    min-height: 0;
+  }
+  .admin-body #technologies-panel.tech-list-expanded #admin-tech-list {
+    flex: 1 1 0;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+  }
+  .admin-body #technologies-panel.tech-list-expanded .tech-category-manager[open] {
+    max-height: 250px;
+    overflow-y: auto;
+  }
+}
+/* Não deixar o cabeçalho, o contador nem as categorias encolherem ao expandir. */
+#technologies-panel .admin-list > .card-heading,
+#technologies-panel .admin-list > .admin-search-bar,
+#technologies-panel .admin-list > .admin-list-footer,
+#technologies-panel .admin-list > .tech-category-manager {
+  flex-shrink: 0;
+}

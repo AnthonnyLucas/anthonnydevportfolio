@@ -262,8 +262,12 @@ export function setupCmsAdmin({request,showStatus}) {
     const all=state.techShowAll||Boolean(query)||category!=='all';
     const shown=all?matches:matches.slice(0,limit);
     $('#tech-list-summary').textContent=state.techLoadError||`${shown.length} de ${matches.length} tecnologia(s) · ${state.technologies.length} cadastradas`;
-    $('#tech-show-all').hidden=matches.length<=limit||Boolean(query)||category!=='all';
-    $('#tech-show-all').textContent=state.techShowAll?'Mostrar as primeiras 18':'Ver todas as tecnologias';
+    const canExpand=matches.length>limit&&!query&&category==='all';
+    const expanded=canExpand&&state.techShowAll;
+    $('#tech-show-all').hidden=!canExpand;
+    $('#tech-show-all').textContent=expanded?'Mostrar as primeiras 18':'Ver todas as tecnologias';
+    $('#tech-show-all').setAttribute('aria-expanded',String(expanded));
+    $('#technologies-panel').classList.toggle('tech-list-expanded',expanded);
     if(!matches.length){
       list.append(create('p','list-empty',state.techLoadError || (query||category!=='all'?'Nenhuma tecnologia corresponde à pesquisa.':'Nenhuma tecnologia cadastrada.')));
       return;
@@ -305,7 +309,7 @@ export function setupCmsAdmin({request,showStatus}) {
   }
   $('#tech-search').addEventListener('input',()=>{state.techShowAll=false;renderTechList();});
   $('#tech-filter').addEventListener('change',()=>{state.techShowAll=false;renderTechList();});
-  $('#tech-show-all').addEventListener('click',()=>{state.techShowAll=!state.techShowAll;renderTechList();});
+  $('#tech-show-all').addEventListener('click',()=>{state.techShowAll=!state.techShowAll;renderTechList();$('#admin-tech-list').scrollTop=0;});
   t('logo').addEventListener('change',()=>{
     releaseImage('techImageObjectUrl');const file=t('logo').files?.[0];
     if(!file){techPreview(state.techLogo);return;}

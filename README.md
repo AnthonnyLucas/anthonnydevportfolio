@@ -105,3 +105,8 @@ O carrossel faz parte deste pacote atualizado. Estas alterações **ainda não f
 ## Diagnóstico de erro no login
 
 Se aparecer “operação inválida” ou falha no login, consulte `CONFIGURAR_LOGIN_NETLIFY.md`. O endereço `/.netlify/functions/auth` deve retornar **JSON**, não HTML ou 404. Quando `configured` é `false`, configure as três variáveis da Netlify; quando `configured` é `true` mas o login falha com 401, revise e-mail e senha usados para gerar o hash. Não há login offline válido em um site estático simples.
+
+
+## Layout de Tecnologias — v5.2
+
+O botão **Ver todas as tecnologias** amplia a lista na coluna esquerda do painel administrativo, aproveitando a altura do formulário à direita sem excedê-la. Consulte `ALTERACOES_V5_2_LAYOUT_TECNOLOGIAS.md` para detalhes e testes.

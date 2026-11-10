@@ -40,3 +40,17 @@ test('technologies panel has category CRUD controls, searchable logos, and align
   assert.ok(cms.includes("Promise.allSettled"));
   assert.ok(catalog.includes('localIcons'));
 });
+
+
+test('v5.2: Ver todas as tecnologias expande somente a lista e preserva a altura do editor',()=>{
+  const css=read('public/assets/v5.css');
+  const js=read('public/assets/cms-admin.js');
+  const html=read('public/admin/index.html');
+  assert.match(css,/v5\.2 — Só Tecnologias/);
+  assert.match(css,/#technologies-panel\.tech-list-expanded #admin-tech-list/);
+  assert.match(css,/height: var\(--tech-editor-height, 1100px\)/);
+  assert.match(css,/#technologies-panel\.tech-list-expanded \.tech-category-manager\[open\]/);
+  assert.match(js,/classList\.toggle\('tech-list-expanded',expanded\)/);
+  assert.match(js,/setAttribute\('aria-expanded',String\(expanded\)\)/);
+  assert.match(html,/id="tech-show-all"[^>]+aria-controls="admin-tech-list"/);
+});
