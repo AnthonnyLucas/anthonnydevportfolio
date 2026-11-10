@@ -171,3 +171,140 @@
 #technologies-panel .admin-list > .tech-category-manager {
   flex-shrink: 0;
 }
+
+
+/* v5.3 — acabamento consistente do dashboard e aproveitamento da coluna Tecnologias. */
+/* Uma única linguagem de rolagem para todas as listas, catálogos e painéis administrativos. */
+.admin-body,
+.admin-body :where(*) {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--green) 83%, #488b41) color-mix(in srgb, var(--panel2) 84%, #080f1e);
+}
+.admin-body::-webkit-scrollbar,
+.admin-body *::-webkit-scrollbar { width: 9px; height: 9px; }
+.admin-body::-webkit-scrollbar-track,
+.admin-body *::-webkit-scrollbar-track {
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--panel2) 88%, #080f1e);
+}
+.admin-body::-webkit-scrollbar-thumb,
+.admin-body *::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  border: 2px solid color-mix(in srgb, var(--panel2) 88%, #080f1e);
+  background: color-mix(in srgb, var(--green) 83%, #488b41);
+}
+.admin-body::-webkit-scrollbar-thumb:hover,
+.admin-body *::-webkit-scrollbar-thumb:hover { background: var(--green); }
+/* Corrigir os estilos legados que atribuíam cor cinza somente à lista principal. */
+.admin-body .admin-scroll-list,
+.admin-body .admin-category-manager,
+.admin-body .category-list,
+.admin-body .icon-catalog-grid,
+.admin-body .cms-section-list {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--green) 83%, #488b41) color-mix(in srgb, var(--panel2) 84%, #080f1e);
+}
+
+/* O comando de categorias deve ter aparência de ação secundária — não uma faixa cinza. */
+#technologies-panel .tech-category-shortcut {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  align-self: stretch;
+  min-height: 43px;
+  margin: 0 0 15px;
+  padding: 10px 15px;
+  border: 1px solid color-mix(in srgb, var(--green) 50%, var(--line));
+  border-radius: 10px;
+  background: linear-gradient(115deg,
+    color-mix(in srgb, var(--green) 15%, var(--panel2)),
+    color-mix(in srgb, var(--green) 7%, var(--panel)));
+  box-shadow: inset 0 1px rgba(255,255,255,.045);
+  color: var(--green);
+  font: 700 12px var(--font);
+  text-decoration: none;
+  transition: border-color .2s, background .2s, transform .2s;
+}
+#technologies-panel .tech-category-shortcut:hover {
+  border-color: var(--green);
+  background: color-mix(in srgb, var(--green) 20%, var(--panel));
+  transform: translateY(-1px);
+}
+#technologies-panel .tech-category-shortcut:focus-visible { outline: 2px solid var(--green); outline-offset: 2px; }
+
+/* Pesquisa e Limpar na mesma linha e mesma altura, sem margem herdada do formulário. */
+#technologies-panel .icon-catalog-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 10px;
+  margin: 8px 0 14px;
+}
+#technologies-panel .icon-catalog-controls #tech-icon-search {
+  min-width: 0;
+  width: 100%;
+  height: 43px;
+  min-height: 43px;
+  box-sizing: border-box;
+  margin: 0;
+}
+#technologies-panel .icon-catalog-controls #tech-icon-clear {
+  margin: 0;
+  height: 43px;
+  min-height: 43px;
+  padding: 0 18px;
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+}
+
+/* O espaço que sobrava abaixo de "Gerenciar categorias" passa a ser ocupado pelo painel. */
+@media (min-width: 931px) {
+  .admin-body #technologies-panel > .admin-list {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: var(--tech-editor-height, 1100px);
+    max-height: var(--tech-editor-height, 1100px);
+    min-height: 0;
+  }
+  .admin-body #technologies-panel > .admin-list #technology-category-manager[open] {
+    /* details mantém seu comportamento nativo de expandir/recolher. */
+    display: block;
+    flex: 1 1 33%;
+    min-height: 210px;
+    max-height: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+  }
+  .admin-body #technologies-panel > .admin-list #technology-category-manager:not([open]) {
+    flex: 0 0 auto;
+    min-height: 0;
+    max-height: none;
+    overflow: visible;
+  }
+  .admin-body #technologies-panel.tech-list-expanded > .admin-list #admin-tech-list {
+    flex: 2 1 0;
+    min-height: 180px;
+    height: auto;
+    max-height: none;
+    overflow-y: auto;
+  }
+  /* No modo compacto, a categoria aberta recebe a área livre, evitando rodapé vazio. */
+  .admin-body #technologies-panel:not(.tech-list-expanded) > .admin-list #admin-tech-list {
+    flex: 0 1 auto;
+  }
+}
+@media (max-width: 930px) {
+  .admin-body #technologies-panel > .admin-list #technology-category-manager[open] {
+    overflow-y: auto;
+    max-height: 310px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  #technologies-panel .tech-category-shortcut { transition: none; }
+}
