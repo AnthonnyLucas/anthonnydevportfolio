@@ -1,3 +1,5 @@
+> **Versão 5.9:** Light/Dark Mode unificado no site e no dashboard, partículas discretas em todas as seções, Contato com janela adaptativa, scrollbar verde e Gmail monocromático. Consulte `ALTERACOES_V5_9_TEMAS_PARTICULAS.md`.
+
 ## Atualização v5.7
 
 Setas minimalistas fora dos cartões nas três vitrines e gerenciamento dos quatro ícones sociais em **Administração → Páginas & Textos → Redes sociais**. Consulte `ALTERACOES_V5_7_SETAS_E_REDES.md` para exemplos e testes.

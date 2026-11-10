@@ -1,0 +1,70 @@
+/* v5.9 — Design system para os temas, microinterações e rede de partículas. */
+:root{--scroll-accent:#a6eb79;--scroll-track:transparent}
+html[data-theme="light"]{--scroll-accent:#479757;--scroll-track:transparent}
+html,body,body *,html *{scrollbar-width:thin;scrollbar-color:var(--scroll-accent) transparent}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-track{background:transparent!important}
+::-webkit-scrollbar-thumb{background:var(--scroll-accent)!important;border:2px solid transparent;border-radius:12px;background-clip:padding-box!important}
+::-webkit-scrollbar-thumb:hover{background:var(--green)!important}
+/* A preferência de cor não pode introduzir uma trilha preta nas listas do dashboard. */
+.admin-body,.admin-body :where(*){scrollbar-color:var(--scroll-accent) transparent!important}
+.admin-body::-webkit-scrollbar-track,.admin-body *::-webkit-scrollbar-track{background:transparent!important}
+.admin-body::-webkit-scrollbar-thumb,.admin-body *::-webkit-scrollbar-thumb{background:var(--scroll-accent)!important;border:2px solid transparent;border-radius:10px;background-clip:padding-box!important}
+
+/* Controle único para site e administração, com animação do indicador deslizante. */
+.theme-switch{width:93px;height:44px;padding:3px;display:inline-flex;align-items:center;justify-content:center;flex:none;border-radius:999px;position:relative;border:1px solid color-mix(in srgb,var(--green) 32%,var(--line));color:var(--muted);background:linear-gradient(130deg,color-mix(in srgb,var(--panel2) 88%,transparent),color-mix(in srgb,var(--panel) 90%,transparent));box-shadow:inset 0 1px color-mix(in srgb,var(--text) 9%,transparent),0 5px 22px #0002;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);transition:border-color .25s,box-shadow .25s,transform .25s;cursor:pointer}
+.theme-switch:hover{border-color:color-mix(in srgb,var(--green) 68%,var(--line));box-shadow:0 0 20px color-mix(in srgb,var(--green) 12%,transparent),0 5px 22px #0001}
+.theme-switch:active{transform:scale(.97)}
+.theme-switch-track{width:100%;height:100%;position:relative;display:grid;grid-template-columns:1fr 1fr;place-items:center}
+.theme-switch-track>svg{width:19px;height:19px;position:relative;z-index:2;transition:color .2s,transform .25s}
+.theme-switch-thumb{width:41px;position:absolute;top:0;left:0;bottom:0;z-index:1;border-radius:50%;background:linear-gradient(140deg,color-mix(in srgb,var(--green) 20%,var(--panel2)),color-mix(in srgb,var(--cyan) 10%,var(--panel)));border:1px solid color-mix(in srgb,var(--green) 42%,var(--line));box-shadow:0 4px 15px #0002,0 0 15px color-mix(in srgb,var(--green) 10%,transparent);transform:translateX(44px);transition:transform .32s cubic-bezier(.22,1,.36,1),background .28s}
+html[data-theme="light"] .theme-switch-thumb{transform:translateX(0);background:linear-gradient(145deg,#fff,#e0f4db);border-color:#aed7a9}
+html[data-theme="dark"] .theme-icon-moon{color:var(--green);transform:rotate(-9deg)}
+html[data-theme="light"] .theme-icon-sun{color:#ae7e19;transform:rotate(18deg)}
+html[data-theme="light"] .theme-switch{background:linear-gradient(130deg,#f8fafc,#e4edf3);border-color:#bed0c8}
+.admin-theme-control{display:flex;align-items:center;justify-content:center;margin-left:12px}
+.admin-top .admin-back-button{margin-left:auto}
+@media(max-width:520px){.admin-top{flex-wrap:wrap;gap:10px}.admin-top .admin-back-button{margin-left:auto}.admin-theme-control{margin-left:0}.theme-switch{width:89px;height:42px}.theme-switch-thumb{width:39px}html[data-theme="dark"] .theme-switch-thumb{transform:translateX(42px)}}
+
+/* Janela de código do Contato segue as mesmas variáveis cromáticas do primeiro bloco de código. */
+html[data-theme="dark"] .contact-code-window{background:linear-gradient(153deg,color-mix(in srgb,var(--panel2) 90%,transparent),color-mix(in srgb,var(--panel) 78%,transparent) 57%,var(--bg2))}
+html[data-theme="light"] .contact-code-window{background:linear-gradient(151deg,rgba(255,255,255,.95),rgba(239,247,252,.89) 57%,rgba(224,236,246,.91));border-color:rgba(72,112,153,.28);box-shadow:0 24px 62px rgba(66,91,130,.18),inset 0 1px rgba(255,255,255,.95),0 0 31px rgba(103,149,207,.11)}
+html[data-theme="light"] .contact-code-head{color:#506582;border-bottom-color:rgba(70,98,136,.17)}
+html[data-theme="light"] .contact-code-body>span{color:#263c56}
+html[data-theme="light"] .contact-code-body i{color:#7a8da2}
+html[data-theme="light"] .contact-code-body b{color:#7955bb}
+html[data-theme="light"] .contact-code-body em{color:#397728}
+html[data-theme="light"] .contact-code-body strong{color:#087c99}
+html[data-theme="light"] .contact-code-status{color:#358345!important}
+html[data-theme="light"] .contact-code-cursor{color:#358345}
+html[data-theme="light"] .contact-art-chip{background:rgba(250,254,255,.92);border-color:rgba(74,121,151,.23);color:#317b4a;box-shadow:0 12px 28px rgba(82,110,145,.15)}
+html[data-theme="light"] .contact-art-loop{border-color:rgba(67,115,171,.22)}
+html[data-theme="light"] .contact-art-loop-two{border-color:rgba(61,134,81,.19)}
+html[data-theme="light"] .contact-art-aura{background:radial-gradient(ellipse,rgba(136,184,234,.21),transparent 65%)}
+html[data-theme="light"] .contact-code-signal{background:#429457;box-shadow:0 0 10px #42945790}
+html[data-theme="light"] .contact-section{background:radial-gradient(ellipse at 17% 48%,rgba(121,177,218,.11),transparent 43%),radial-gradient(ellipse at 85% 18%,rgba(82,166,113,.075),transparent 44%),var(--bg)}
+
+/* Ícone neutro, como os demais links sociais. */
+#sidebar-gmail{color:var(--muted)}
+#sidebar-gmail svg{stroke:currentColor}
+#sidebar-gmail:hover{color:var(--text)}
+
+/* Redes de dados discretas por seção: não interceptam cliques, seleções ou rolagem. */
+.hero,.content-section,.admin-wrap{position:relative;isolation:isolate}
+.section-particles{position:absolute;top:0;left:0;z-index:0;pointer-events:none!important;user-select:none;opacity:.55;contain:strict}
+html[data-theme="light"] .section-particles{opacity:.39}
+.hero>:not(.section-particles),.content-section>:not(.section-particles),.admin-wrap>:not(.section-particles){position:relative;z-index:1}
+/* Campos e cartões continuam legíveis mesmo na presença da rede. */
+.admin-body{background:radial-gradient(circle at 78% 3%,color-mix(in srgb,var(--purple) 10%,transparent),transparent 42%),var(--bg)}
+html[data-theme="light"] .admin-body .admin-card,
+html[data-theme="light"] .admin-body .login-card,
+html[data-theme="light"] .admin-body .admin-summary>div{background:rgba(255,255,255,.90);box-shadow:0 14px 45px rgba(89,115,147,.075)}
+html[data-theme="light"] .admin-body .admin-tabs{background:rgba(235,244,251,.88)}
+html[data-theme="light"] .admin-body .admin-list-item,
+html[data-theme="light"] .admin-body input,
+html[data-theme="light"] .admin-body select,
+html[data-theme="light"] .admin-body textarea{color:var(--text);border-color:var(--line)}
+@media(prefers-reduced-motion:reduce){.theme-switch-thumb,.theme-switch-track>svg{transition:none!important}.section-particles{opacity:.2}}
+/* Contraste dos botões primários no tema claro. */
+html[data-theme="light"] .button-primary,
+html[data-theme="light"] .admin-body .small-primary{color:#fff}

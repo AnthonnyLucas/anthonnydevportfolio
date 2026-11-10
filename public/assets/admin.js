@@ -1,3 +1,7 @@
+import { initTheme } from './theme-controls.js';
+import { initParticles } from './particles.js';
+initTheme();
+initParticles({ admin: true });
 import { setupCmsAdmin } from './cms-admin.js';
 import { setupCategoryAdmin } from './category-admin.js';
 import { createAdminFeedback } from './admin-feedback.js';

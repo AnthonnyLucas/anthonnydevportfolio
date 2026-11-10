@@ -2,6 +2,8 @@ import { setupProjects } from './project-carousel.js';
 import { setupCertificates } from './cert-carousel.js';
 import { setupTechCarousel } from './tech-carousel.js';
 import { loadSiteContent } from './content-client.js';
+import { initTheme } from './theme-controls.js';
+import { initParticles } from './particles.js';
 
 const qs = (s, root = document) => root.querySelector(s);
 const qsa = (s, root = document) => [...root.querySelectorAll(s)];
@@ -12,15 +14,9 @@ const el = (tag, cls = '', text = '') => {
   return node;
 };
 
-// Tema persistente (somente preferências visuais, nunca credenciais).
-const savedTheme = localStorage.getItem('portfolio-theme');
-const preferred = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-document.documentElement.dataset.theme = ['dark', 'light'].includes(savedTheme) ? savedTheme : preferred;
-qs('#theme-toggle').addEventListener('click', () => {
-  const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-  document.documentElement.dataset.theme = theme;
-  localStorage.setItem('portfolio-theme', theme);
-});
+// O mesmo gerenciador de temas atende ao site público e ao painel administrativo.
+initTheme();
+initParticles();
 qs('#year').textContent = new Date().getFullYear();
 
 // Scroll e navegação ativa sem eventos pesados.
