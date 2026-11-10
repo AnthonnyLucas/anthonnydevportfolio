@@ -2,7 +2,7 @@ import { getStore } from '@netlify/blobs';
 import { skills } from '../../public/assets/data.js';
 import { authError, json, sameOrigin, validSession } from './lib/security.mjs';
 const cats = ['linguagens','frameworks','infra','iot'];
-const LIMIT = 100;
+const LIMIT = 400;
 // Cores originais preservadas para não perder a identidade individual das 25 marcas.
 const originalColors = {
   Java:'#E76F37',Python:'#3676AB',C:'#5B7FBD','C++':'#649AD6','C#':'#AA83D8',
@@ -17,6 +17,7 @@ const cut = (v,max) => String(v??'').trim().slice(0,max);
 function validateLogo(value) {
   const url=cut(value,800);
   if (!url) return '';
+  if (url==='/assets/tech-logos/assembly.svg') return url;
   if (/^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(url)) return url;
   try {const parsed=new URL(url);if(parsed.protocol === 'https:' && !parsed.username && !parsed.password)return parsed.href;}catch {}
   throw new Error('Logo deve ser uma URL HTTPS ou uma imagem enviada pelo painel.');

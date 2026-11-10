@@ -89,7 +89,7 @@ export function setupTechCarousel() {
     const wrap=document.createElement('span');
     wrap.className='tech-logo-wrap';
     const mark=brandMarks[skill.label];
-    const external = typeof skill.logoUrl === 'string' && (skill.logoUrl.startsWith('https://') || /^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(skill.logoUrl)) ? skill.logoUrl : '';
+    const external = typeof skill.logoUrl === 'string' && (skill.logoUrl==='/assets/tech-logos/assembly.svg' || skill.logoUrl.startsWith('https://') || /^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(skill.logoUrl)) ? skill.logoUrl : '';
     const slug = {'C++':'cpp','C#':'csharp'}[skill.label] || skill.label.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
     const fallback = `/assets/tech-logos/${slug}.svg`;
     if (!external && !mark) {

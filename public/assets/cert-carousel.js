@@ -27,6 +27,8 @@ export function setupCertificates() {
   if (!track || !viewport || !categoryBar) return;
 
   let all = certificates;
+  let categories = certificateCategories.filter(x=>x!=='Todas').map(label=>({id:label,label}));
+  let selectedCategory='all';
   let selection = [...all];
   let index = 0;
   let gesture = null;
@@ -107,24 +109,20 @@ export function setupCertificates() {
     announce();
     previous.disabled = next.disabled = selection.length <= visibleCount();
   }
-  certificateCategories.forEach(category => {
-    const button = create('button', 'filter-chip', category);
-    button.type = 'button';
-    button.dataset.category = category;
-    const active = category === 'Todas';
-    button.classList.toggle('active', active);
-    button.setAttribute('aria-pressed', String(active));
-    button.addEventListener('click', () => {
-      [...categoryBar.children].forEach(sibling => {
-        const selected = sibling === button;
-        sibling.classList.toggle('active', selected);
-        sibling.setAttribute('aria-pressed', String(selected));
+  function renderCategories(){
+    categoryBar.replaceChildren();
+    for(const cat of [{id:'all',label:'Todas'},...categories]){
+      const button=create('button','filter-chip',cat.label);button.type='button';button.dataset.category=cat.id;
+      const active=cat.id===selectedCategory;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));
+      button.addEventListener('click',()=>{
+        selectedCategory=cat.id;
+        [...categoryBar.children].forEach(sibling=>{const on=sibling===button;sibling.classList.toggle('active',on);sibling.setAttribute('aria-pressed',String(on));});
+        selection=all.filter(item=>cat.id==='all'||item.groupId===cat.id||item.group===cat.label);render();
       });
-      selection = all.filter(item => category === 'Todas' || item.group === category);
-      render();
-    });
-    categoryBar.append(button);
-  });
+      categoryBar.append(button);
+    }
+  }
+  renderCategories();
   previous.addEventListener('click', () => move(index - 1));
   next.addEventListener('click', () => move(index + 1));
   viewport.addEventListener('keydown', event => {
@@ -177,14 +175,13 @@ export function setupCertificates() {
   dialog.addEventListener('click', event => { if (event.target === dialog) dialog.close(); });
   dialog.addEventListener('close', () => { dialogImage.removeAttribute('src'); });
   async function load() {
-    try {
-      const response = await fetch('/.netlify/functions/certificates', {cache:'no-store'});
-      if (!response.ok || !response.headers.get('content-type')?.includes('application/json')) throw new Error('API indisponível');
-      const data = await response.json();
-      if (Array.isArray(data.certificates)) all = data.certificates;
-    } catch { /* Pré-visualização estática: mantém o catálogo inicial. */ }
-    selection = [...all];
-    render();
+    const [records,labels]=await Promise.allSettled([
+      fetch('/.netlify/functions/certificates',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject()),
+      fetch('/.netlify/functions/categories?kind=certificates',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject())
+    ]);
+    if(records.status==='fulfilled' && Array.isArray(records.value.certificates))all=records.value.certificates;
+    if(labels.status==='fulfilled' && Array.isArray(labels.value.categories))categories=labels.value.categories;
+    selection=[...all];renderCategories();render();
   }
   load();
 }

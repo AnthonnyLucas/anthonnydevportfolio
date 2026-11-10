@@ -1,0 +1,73 @@
+/* Portfólio v5 — catálogo de projetos e CMS escalável */
+.project-showcase{margin-top:22px}
+.project-viewport{width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;scroll-behavior:smooth;scroll-snap-type:x mandatory;overscroll-behavior-x:contain;touch-action:pan-x pan-y;cursor:grab;border-radius:19px}
+.project-viewport::-webkit-scrollbar{display:none}
+.project-viewport.is-grabbing{cursor:grabbing;scroll-behavior:auto;scroll-snap-type:none;user-select:none}
+#project-grid.project-grid{display:flex;gap:20px;align-items:stretch;width:100%;padding:10px 2px 16px;min-height:390px}
+#project-grid>.project-card{flex:0 0 calc((100% - 20px)/2);min-width:0;scroll-snap-align:start;border-radius:20px;display:flex;flex-direction:column;background:linear-gradient(145deg,color-mix(in srgb,var(--panel2) 72%,transparent),var(--panel));box-shadow:0 14px 44px rgba(0,0,0,.12);overflow:hidden}
+#project-grid>.project-card:hover{border-color:color-mix(in srgb,var(--green) 44%,var(--line));transform:translateY(-3px)}
+#project-grid>.project-card .project-body{flex:1;display:flex;flex-direction:column}
+#project-grid>.project-card .project-links{margin-top:auto;padding-top:16px}
+.project-category-badges{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px}
+.project-category-badges>.project-category{display:inline-flex;max-width:100%;margin:0;padding:5px 10px;background:color-mix(in srgb,var(--green) 10%,var(--panel2));border:1px solid var(--line);border-radius:999px;font-size:10px;letter-spacing:.035em}
+.project-showcase-controls{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:4px 4px 10px}
+.project-counter{font:650 12px var(--display);letter-spacing:.09em;color:var(--muted);font-variant-numeric:tabular-nums}
+.project-nav{display:flex;gap:10px}
+.project-nav button{height:43px;width:49px;display:grid;place-items:center;border:1px solid var(--line);border-radius:11px;background:color-mix(in srgb,var(--panel2) 78%,transparent);color:var(--text);font:500 20px var(--font);transition:transform .22s,background .22s,border-color .22s}
+.project-nav button:hover:not(:disabled){transform:translateY(-2px);border-color:var(--green);background:var(--panel2)}
+.project-nav button:disabled{opacity:.32;cursor:not-allowed}
+.project-viewport .project-empty{width:100%;flex:1;min-height:250px;display:flex;flex-direction:column;justify-content:center;align-items:center}
+/* Sidebar: logo editável e links de redes sociais sem setas */
+.sidebar .brand-mark{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;min-width:34px;min-height:37px}
+.sidebar .brand-mark img{width:38px;height:38px;object-fit:contain;border-radius:9px}
+.sidebar .brand-mark [hidden]{display:none!important}
+.sidebar .brand-text{min-width:0;overflow-wrap:anywhere;font-weight:750}
+.sidebar-social-links{display:flex;gap:11px;align-items:center;margin:0 0 4px}
+.sidebar-social-icon{height:39px;width:43px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:12px;color:var(--muted);transition:transform .2s,background .2s,border-color .2s,color .2s}
+.sidebar-social-icon svg{width:19px;height:19px}
+.sidebar-social-icon:hover{color:var(--green);background:color-mix(in srgb,var(--green) 7%,transparent);transform:translateY(-2px);border-color:color-mix(in srgb,var(--green) 40%,var(--line))}
+.sidebar-custom-links{display:flex;flex-direction:column;gap:7px;max-height:110px;overflow:auto;max-width:100%}
+.sidebar-custom-links a{font:500 11px var(--font);color:var(--muted);overflow-wrap:anywhere}
+.sidebar-custom-links a:hover{color:var(--green)}
+/* CMS: coluna das listas não cresce com novos registros */
+.admin-body #projects-panel>.admin-list,.admin-body #technologies-panel>.admin-list,.admin-body #certificates-panel>.admin-list{height:min(850px,calc(100vh - 110px));min-height:570px;display:flex;flex-direction:column;gap:12px;overflow:hidden}
+.admin-search-bar{display:grid;gap:9px}
+.admin-search-bar label{font:650 11px var(--font);color:var(--text)}
+.admin-search-bar input,.admin-search-bar select,.category-new input,.icon-catalog-controls input{width:100%;min-width:0;background:var(--bg2);border:1px solid var(--line);border-radius:11px;color:var(--text);padding:12px 14px;outline:none;font:500 12px var(--font)}
+.admin-search-bar input:focus,.admin-search-bar select:focus,.category-new input:focus,.icon-catalog-controls input:focus{border-color:var(--green)}
+.admin-body .admin-scroll-list{min-height:100px;max-height:none;overflow-y:auto;overflow-x:hidden;flex:1;scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--green) 45%,var(--panel)) transparent;overscroll-behavior:contain;padding-right:4px}
+.admin-body .admin-list-item{min-width:0}
+.admin-body .admin-list-item h3{overflow-wrap:anywhere}
+.admin-list-footer{display:flex;justify-content:space-between;align-items:center;gap:8px;font:550 11px var(--font);color:var(--muted);border-top:1px solid var(--line);padding-top:10px}
+.admin-list-footer button{border:1px solid var(--line);background:var(--panel2);border-radius:8px;padding:8px 11px;color:var(--text);font-size:11px;white-space:nowrap}
+.admin-list-footer button:hover{border-color:var(--green)}
+.admin-list-footer button[hidden]{display:none}
+.multi-category-picker{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:13px;margin-top:8px}
+.category-check{display:flex;align-items:center;gap:9px;border:1px solid var(--line);background:var(--panel);border-radius:9px;padding:10px 12px;cursor:pointer;font:600 11px var(--font);color:var(--text);min-width:0}
+.category-check input{accent-color:var(--green)}.category-check span{overflow-wrap:anywhere}
+.admin-category-manager{border-top:1px solid var(--line);padding-top:11px;flex:0 1 auto;overflow:auto;max-height:245px;scrollbar-width:thin}
+.admin-category-manager>summary{cursor:pointer;font:700 12px var(--display);color:var(--text);padding:4px 0}
+.admin-category-manager[open]{padding-bottom:6px}
+.category-new,.icon-catalog-controls{display:flex;gap:7px;align-items:center;margin:10px 0}
+.category-new .small-primary,.icon-catalog-controls .small-primary{flex-shrink:0}
+.category-list{display:flex;flex-direction:column;gap:6px;margin-top:9px}
+.category-manage-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--bg2);font-size:11px}
+.category-manage-row span{overflow-wrap:anywhere}.category-manage-row button{font-size:10px;padding:6px 8px}
+.icon-catalog-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;max-height:248px;overflow:auto;scrollbar-width:thin;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:9px}
+.catalog-logo-choice{display:flex;flex-direction:column;justify-content:center;align-items:center;min-height:82px;gap:7px;min-width:0;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--text);padding:9px 5px;transition:transform .2s,border-color .2s}
+.catalog-logo-choice:hover,.catalog-logo-choice[aria-pressed="true"]{border-color:var(--green);transform:translateY(-2px)}
+.catalog-logo-choice img{height:32px;width:32px;object-fit:contain}
+.catalog-logo-choice small{font:550 10px var(--font);line-height:1.3;text-align:center;overflow-wrap:anywhere}
+.catalog-logo-fallback{font:700 12px var(--display);color:var(--green);height:32px;display:grid;place-items:center}
+#tech-icon-count{margin:0 0 13px}
+@media(max-width:740px){#project-grid>.project-card{flex-basis:100%}.project-showcase-controls{padding-bottom:4px}}
+@media(max-width:930px){.admin-body #projects-panel>.admin-list,.admin-body #technologies-panel>.admin-list,.admin-body #certificates-panel>.admin-list{height:630px;min-height:0}}
+@media(max-width:530px){.multi-category-picker{grid-template-columns:1fr}.icon-catalog-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.project-filters{flex-wrap:wrap}.category-new{flex-wrap:wrap}}
+@media(prefers-reduced-motion:reduce){.project-viewport{scroll-behavior:auto}.project-nav button,.sidebar-social-icon,.catalog-logo-choice{transition:none}}
+/* As duas colunas crescem juntas; o conteúdo rolável não aumenta a página. */
+.admin-body #projects-panel,.admin-body #technologies-panel,.admin-body #certificates-panel{align-items:stretch}
+.admin-body #projects-panel>.admin-list,.admin-body #technologies-panel>.admin-list,.admin-body #certificates-panel>.admin-list{height:auto;max-height:none;min-height:0}
+.admin-body .admin-scroll-list{flex:0 1 auto;height:clamp(220px,39vh,405px);max-height:405px}
+.sidebar .brand-mark #sidebar-brand-glyph{color:var(--text)}
+.sidebar .brand-mark .brand-dot{color:var(--green)}
+@media(max-width:930px){.admin-body #projects-panel>.admin-list,.admin-body #technologies-panel>.admin-list,.admin-body #certificates-panel>.admin-list{height:auto;min-height:0}}

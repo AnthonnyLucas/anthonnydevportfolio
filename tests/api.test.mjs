@@ -49,3 +49,48 @@ test('technologies: protected CRUD, reorder, field sanitation and empty catalog'
   r=await call(techEndpoint,'technologies','POST',{label:'Foobar',cat:'invalid',color:'#ffffff'},{auth:true});assert.equal(r.status,400);
   r=await call(techEndpoint,'technologies','PATCH',{ids:['arbitrary']},{auth:true});assert.equal(r.status,400);
 });
+
+import projectEndpoint from '../netlify/functions/projects.mjs';
+import certificateEndpoint from '../netlify/functions/certificates.mjs';
+import categoryEndpoint from '../netlify/functions/categories.mjs';
+import {getStore} from './mock-blobs.mjs';
+test('categories: protected CRUD, multi-classification, migration of V4, rename and deletion protections',async()=>{
+  reset();
+  const categoryReq=(kind,method='GET',payload=null,opts={})=>call(categoryEndpoint,`categories?kind=${kind}`,method,payload,opts);
+  let r=await categoryReq('projects');assert.equal(r.status,200);assert.equal(r.body.categories.length,5);
+  r=await categoryReq('projects','POST',{label:'Cloud AWS'});assert.equal(r.status,401);
+  r=await categoryReq('projects','POST',{label:'Cloud AWS'},{auth:true});assert.equal(r.status,200);
+  const aws=r.body.categories.find(c=>c.label==='Cloud AWS');assert.ok(aws?.id);
+  const iot=r.body.categories.find(c=>c.label==='IoT');
+  const full=r.body.categories.find(c=>c.label==='Full Stack');
+  const ai=r.body.categories.find(c=>c.label==='Inteligência Artificial');
+  r=await call(projectEndpoint,'projects','POST',{title:'Teste multi-categoria',description:'Sistema de testes',categories:[iot.id,aws.id,full.id,ai.id],tags:[],featured:false},{auth:true});
+  assert.equal(r.status,200);const project=r.body.projects[0];assert.deepEqual(project.categories,[iot.id,aws.id,full.id,ai.id]);
+  r=await categoryReq('projects','POST',{id:iot.id,label:'Sistemas IoT'},{auth:true});assert.equal(r.status,200);
+  r=await call(projectEndpoint,'projects');assert.equal(r.body.projects[0].category,'Sistemas IoT');assert.deepEqual(r.body.projects[0].categories,[iot.id,aws.id,full.id,ai.id]);
+  r=await categoryReq('projects','DELETE',{id:aws.id},{auth:true});assert.equal(r.status,409);
+  r=await call(projectEndpoint,'projects','DELETE',{id:project.id},{auth:true});assert.equal(r.status,200);
+  r=await categoryReq('projects','DELETE',{id:aws.id},{auth:true});assert.equal(r.status,200);
+  // Registro anterior sem categories é convertido no servidor antes de renomear.
+  await getStore('portfolio-projects').setJSON('projects',[{id:'legacy-project',title:'Legado',category:'Dados',description:'Antigo projeto'}]);
+  const dataCat=(await categoryReq('projects')).body.categories.find(c=>c.label==='Dados');
+  r=await categoryReq('projects','POST',{id:dataCat.id,label:'Análise de Dados'},{auth:true});assert.equal(r.status,200);
+  r=await call(projectEndpoint,'projects');assert.deepEqual(r.body.projects[0].categories,[dataCat.id]);
+  assert.equal(r.body.projects[0].category,'Análise de Dados');
+  r=await categoryReq('projects','POST',{label:'Análise de Dados'},{auth:true});assert.equal(r.status,409);
+});
+
+test('certificate categories support custom areas, renamed labels and protected deletion',async()=>{
+  reset();
+  const c=(method='GET',data=null,opts={})=>call(categoryEndpoint,'categories?kind=certificates',method,data,opts);
+  let r=await c();assert.equal(r.status,200);assert.ok(r.body.categories.length>=8);
+  r=await c('POST',{label:'Robótica Industrial'},{auth:true});assert.equal(r.status,200);
+  const id=r.body.categories.find(c=>c.label==='Robótica Industrial').id;
+  r=await call(certificateEndpoint,'certificates','POST',{name:'Curso Robótica',description:'Laboratório',hours:'30 horas',org:'Instituto',groupId:id},{auth:true});
+  assert.equal(r.status,200);const certificate=r.body.certificates[0];assert.equal(certificate.groupId,id);
+  r=await c('POST',{id,label:'Automação e Robótica'},{auth:true});assert.equal(r.status,200);
+  r=await call(certificateEndpoint,'certificates');assert.equal(r.body.certificates[0].group,'Automação e Robótica');
+  r=await c('DELETE',{id},{auth:true});assert.equal(r.status,409);
+  r=await call(certificateEndpoint,'certificates','DELETE',{id:certificate.id},{auth:true});assert.equal(r.status,200);
+  r=await c('DELETE',{id},{auth:true});assert.equal(r.status,200);
+});

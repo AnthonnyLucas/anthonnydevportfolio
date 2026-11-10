@@ -1,8 +1,8 @@
-> **Mudanças desta versão:** consulte [ALTERACOES_V4.md](ALTERACOES_V4.md) para a lista de implementações, testes e orientações de uso.
+> **Atualização v5.0:** consulte [ALTERACOES_V5.md](ALTERACOES_V5.md) para catálogo de projetos, categorias múltiplas, listas pesquisáveis, ícones e sidebar editável. As mudanças da versão anterior estão em [ALTERACOES_V4.md](ALTERACOES_V4.md).
 
 # Portfólio profissional — preparado para Netlify
 
-Versão 4.0, construída a partir do projeto atualizado `ProjetoP.rar` (HTML/CSS/JavaScript). O nome do site continua sendo **Portfólio**. Mantém a identidade profissional e adiciona uma interface responsiva com animações, carrossel tridimensional de tecnologias com filtros, galeria dinâmica, vitrine de 18 formações com filtros e imagens, sidebar com acabamento de vidro e gerenciamento de todo o conteúdo pelo painel administrativo.
+Versão 5.0, construída a partir do projeto atualizado `ProjetoP.rar` (HTML/CSS/JavaScript). O nome do site continua sendo **Portfólio**. Mantém a identidade profissional e adiciona uma interface responsiva com animações, carrossel tridimensional de tecnologias com filtros, vitrine horizontal de projetos com dois cartões, categorias dinâmicas e múltiplas, vitrine de 18 formações com filtros e imagens, sidebar com acabamento de vidro e gerenciamento de todo o conteúdo pelo painel administrativo. As listas de projetos, tecnologias e formações possuem busca, filtro, rolagem interna e visualização completa sem alongar a página.
 
 ## Estrutura
 
@@ -10,7 +10,10 @@ Versão 4.0, construída a partir do projeto atualizado `ProjetoP.rar` (HTML/CSS
 - `public/admin/index.html`: formulário de login e painel para editar textos, imagens, tecnologias, projetos e certificados.
 - `public/assets/`: CSS, JavaScript e recursos da interface. Inclui `tech-carousel.js`, `tech-carousel.css` e a pasta `tech-logos` com ícones SVG locais de reserva, além de `cert-carousel.js`, `cert-carousel.css` e imagens disponíveis dos certificados.
 - `netlify/functions/auth.mjs`: autenticação por e-mail e senha com cookie `HttpOnly` assinado.
-- `netlify/functions/projects.mjs`: listagem pública e inclusão/edição/exclusão autenticada de projetos.
+- `netlify/functions/projects.mjs`: listagem pública e inclusão/edição/exclusão autenticada de projetos com múltiplas categorias.
+- `netlify/functions/categories.mjs`: cadastro de categorias para projetos e formações, com identificadores estáveis, migração de dados anteriores e proteção contra exclusão de categorias em uso.
+- `public/assets/project-carousel.js`: vitrine de dois projetos com filtros, setas e arraste.
+- `public/assets/category-admin.js` e `tech-icon-catalog.js`: editor de categorias e catálogo pesquisável de logotipos.
 - `netlify/functions/certificates.mjs`: lista pública e edição autenticada das formações e de suas imagens.
 - `netlify/functions/content.mjs` e `netlify/functions/technologies.mjs`: CMS de seções e catálogo editável com escrita autenticada.
 - `public/assets/site-schema.js` e `public/assets/cms-admin.js`: campos permitidos e interface do editor.
@@ -28,7 +31,7 @@ Versão 4.0, construída a partir do projeto atualizado `ProjetoP.rar` (HTML/CSS
 4. Use a raiz do projeto como base; o `netlify.toml` já define a pasta de publicação `public`, o comando de build e a pasta das funções. Não selecione `public` como diretório base.
 5. Faça o primeiro deploy. O site público já funcionará; o painel mostrará que ainda faltam credenciais.
 6. Para ativar o painel, configure no site da Netlify, em **Project configuration → Environment variables**, as variáveis `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH` e `SESSION_SECRET`. Escolha escopo **Functions** ou **All** e ambiente **Production**; faça novo deploy após configurar.
-7. Gere valores seguros localmente, na raiz do projeto, com `node scripts/gerar-credenciais.mjs`. Este script pede o e-mail e a senha, produz o hash e um segredo; **não salva a senha em arquivos**. Para o acesso definido nesta conversa, use o e-mail `teste@gmail.com` e a senha escolhida anteriormente. O gerador aceita essa senha, mas alerta sobre sua fragilidade. **É altamente recomendado substituí-la por uma senha longa e exclusiva antes de tornar o painel público.** Nunca inclua senhas ou valores reais de configuração no repositório.
+7. Gere valores seguros localmente, na raiz do projeto, com `node scripts/gerar-credenciais.mjs`. Este script pede o e-mail e a senha, produz o hash e um segredo; **não salva a senha em arquivos**. Utilize o e-mail administrativo de sua escolha e defina uma senha longa e exclusiva. O gerador alerta sobre senhas fracas. **É altamente recomendado substituí-la por uma senha longa e exclusiva antes de tornar o painel público.** Nunca inclua senhas ou valores reais de configuração no repositório.
 8. Acesse `https://SEU-SITE.netlify.app/admin/` (ou clique no pequeno cadeado no rodapé do portfólio). Entre com o e-mail e senha definidos; nas abas **Páginas & textos**, **Tecnologias**, **Projetos** e **Formações e certificados**, edite o conteúdo do portfólio. O visitante verá as atualizações após recarregar o site.
 9. Na aba **Forms** da Netlify, habilite **Form detection**, se necessário, e republique para ativar o formulário de contato. As mensagens aparecerão no painel de formulários da Netlify. Configure notificações, se desejar recebê-las por e-mail.
 

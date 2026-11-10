@@ -14,6 +14,22 @@ export function applyContent(content = contentDefaults, root = document) {
     const url=values[node.dataset.urlKey];
     if (typeof url==='string' && url.startsWith('https://')) node.href=url;
   });
+  const brandImage=root.querySelector('#sidebar-brand-icon');
+  const brandGlyph=root.querySelector('#sidebar-brand-glyph');
+  const iconUrl=values.sidebarBrandImage;
+  if (brandImage) {
+    const valid=typeof iconUrl==='string' && (/^https:\/\//.test(iconUrl) || /^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(iconUrl));
+    brandImage.hidden=!valid;
+    if(valid){brandImage.src=iconUrl;brandImage.onerror=()=>{brandImage.hidden=true;if(brandGlyph)brandGlyph.hidden=false;};}
+    if(brandGlyph)brandGlyph.hidden=valid;
+  }
+  const customs=root.querySelector('#sidebar-custom-links');
+  if(customs){customs.replaceChildren();for(let n=1;n<=3;n++){
+    const title=values[`sidebarExtra${n}Name`],url=values[`sidebarExtra${n}Url`];
+    if(!title || !url?.startsWith('https://'))continue;
+    const link=root.createElement('a');link.href=url;link.textContent=title;
+    link.target='_blank';link.rel='noopener noreferrer';customs.append(link);
+  }}
   const contact = root.querySelector('#public-contact-email');
   if (contact && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.contactEmail)) contact.href=`mailto:${values.contactEmail}`;
   const portrait = values.aboutImage;

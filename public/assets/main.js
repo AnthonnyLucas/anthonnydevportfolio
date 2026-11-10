@@ -1,4 +1,4 @@
-import { showcaseProjects } from './data.js';
+import { setupProjects } from './project-carousel.js';
 import { setupCertificates } from './cert-carousel.js';
 import { setupTechCarousel } from './tech-carousel.js';
 import { loadSiteContent } from './content-client.js';
@@ -64,64 +64,4 @@ loadSiteContent();
 
 setupCertificates();
 
-const projectsGrid = qs('#project-grid');
-let currentProjects = [];
-let projectFilter = 'Todos';
-const safeUrl = (s, image = false) => {
-  if (typeof s !== 'string' || !s) return '';
-  if (image && (/^\/.netlify\/functions\/media\?key=[a-z0-9-]{36}\.(jpg|png|webp|gif)$/.test(s) || /^\/assets\/project-(solar|aqua|certificates|curves)\.svg$/.test(s))) return s;
-  try {const url = new URL(s);return ['http:', 'https:'].includes(url.protocol) ? url.href : '';} catch{return '';}
-};
-function renderProjects() {
-  const filtered = currentProjects.filter(p => projectFilter === 'Todos' || p.category === projectFilter);
-  projectsGrid.replaceChildren();
-  if (!filtered.length) {
-    const empty = el('div','project-empty');
-    empty.append(el('span','empty-symbol', projectFilter === 'Todos' ? '⌘' : '◎'));
-    empty.append(el('h3','',projectFilter === 'Todos' ? 'Novos projetos a caminho.' : 'Nenhum projeto nesta categoria.'));
-    const p = el('p','',projectFilter === 'Todos' ? 'Estou organizando cases, imagens e demonstrações dos meus trabalhos. Enquanto isso, vamos conversar sobre o próximo desafio?' : 'Explore outra categoria para conhecer mais projetos.');
-    empty.append(p);
-    if (projectFilter === 'Todos') {const a = el('a','', 'Entrar em contato ↗');a.href='#contato';const span=el('p');span.append(a);empty.append(span);}
-    projectsGrid.append(empty); return;
-  }
-  filtered.sort((a,b) => Number(b.featured)-Number(a.featured));
-  filtered.forEach((project, i) => {
-    const card = el('article','project-card');
-    const visual = el('div','project-visual');
-    const url = safeUrl(project.image, true);
-    if (url) { const img = el('img'); img.src=url; img.alt=`Ilustração conceitual: ${project.title}`;img.loading='lazy';visual.append(img); }
-    else visual.append(el('span','project-glyph','</>'));
-    visual.append(el('span','project-index',String(i + 1).padStart(2,'0')));
-    const body=el('div','project-body');
-    body.append(el('span','project-category',project.category || 'Projeto'),el('h3','',project.title),el('p','',project.description));
-    const tags=el('div','project-tags');
-    (Array.isArray(project.tags)?project.tags:[]).forEach(tag=>tags.append(el('span','',tag)));
-    body.append(tags);
-    const links=el('div','project-links');
-    for (const [key,label] of [['repository','Código ↗'],['demo','Visualizar ↗']]) {
-      const href=safeUrl(project[key]);if (!href) continue;
-      const link=el('a','',label);link.href=href;link.target='_blank';link.rel='noopener noreferrer';links.append(link);
-    }
-    if (links.childNodes.length) body.append(links);
-    card.append(visual,body);
-    projectsGrid.append(card);
-  });
-}
-async function loadProjects() {
-  try {
-    const res = await fetch('/.netlify/functions/projects', { cache:'no-store' });
-    if (!res.ok) throw new Error('Sem API');
-    const body = await res.json();
-    currentProjects = Array.isArray(body.projects) ? body.projects : showcaseProjects;
-  } catch {
-    // A prévia HTML abre sem as funções; os projetos reais só estarão disponíveis no Netlify Dev ou deploy.
-    currentProjects = showcaseProjects;
-  }
-  renderProjects();
-}
-qsa('[data-project-filter]').forEach(btn => btn.addEventListener('click', () => {
-  projectFilter = btn.dataset.projectFilter;
-  qsa('[data-project-filter]').forEach(peer => {peer.classList.toggle('active',peer===btn);peer.setAttribute('aria-pressed',String(peer===btn));});
-  renderProjects();
-}));
-loadProjects();
+setupProjects();

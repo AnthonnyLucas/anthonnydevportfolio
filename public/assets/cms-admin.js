@@ -1,3 +1,4 @@
+import { setupIconCatalog } from './tech-icon-catalog.js';
 import { contentDefaults, contentFields, contentGroups } from './site-schema.js';
 const $=selector=>document.querySelector(selector);
 const create=(tag,cls='',text='')=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text)n.textContent=text;return n;};
@@ -5,7 +6,7 @@ const MAX_IMAGE=4*1024*1024;
 const TYPES=['image/jpeg','image/png','image/webp','image/gif'];
 const safePreview=url => typeof url==='string' && (/^https:\/\//i.test(url) || /^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(url));
 export function setupCmsAdmin({request,showStatus}) {
-  const state={content:{...contentDefaults},revision:0,group:'inicio',technologies:[],imageObjectUrl:'',techImageObjectUrl:'',techLogo:''};
+  const state={content:{...contentDefaults},revision:0,group:'inicio',technologies:[],techShowAll:false,imageObjectUrl:'',techImageObjectUrl:'',techLogo:''};
   const groupButtons=$('#content-group-buttons'),fields=$('#content-fields');
   const contentForm=$('#content-form');
   const fieldsInGroup=()=>contentFields.filter(f=>f.group===state.group);
@@ -99,9 +100,9 @@ export function setupCmsAdmin({request,showStatus}) {
     e.preventDefault();const button=$('#save-content');button.disabled=true;
     try {
       const patch=diffContent();
-      if(state.group==='sobre'){
-        const file=$('#cms-upload-aboutImage')?.files?.[0];
-        if(file){showStatus('Enviando nova fotografia...');patch.aboutImage=await upload(file);}
+      for (const imageKey of ['aboutImage','sidebarBrandImage']) {
+        const file=$(`#cms-upload-${imageKey}`)?.files?.[0];
+        if(file){showStatus('Enviando imagem...');patch[imageKey]=await upload(file);}
       }
       if(!Object.keys(patch).length){showStatus('Nenhuma alteração para salvar.');return;}
       showStatus('Salvando os textos e as imagens no servidor...');
@@ -125,23 +126,32 @@ export function setupCmsAdmin({request,showStatus}) {
   const t=(suffix)=>$(`#technology-${suffix}`);
   const techPreview=(url) => {
     const panel=$('#technology-image-preview');panel.replaceChildren();
-    if(safePreview(url)) {const img=create('img');img.src=url;img.alt='Prévia do ícone';panel.append(img);}
+    if(safePreview(url) || url==='/assets/tech-logos/assembly.svg') {const img=create('img');img.src=url;img.alt='Prévia do ícone';panel.append(img);}
     else panel.append(create('span','', 'Será usado o símbolo de reserva ou o logotipo Devicon.'));
   };
+  const iconCatalog=setupIconCatalog({onSelect:item=>{t('logo-url').value=item.url;state.techLogo=item.url;t('icon').value=item.name==='Assembly'?'ASM':item.name.slice(0,3).toUpperCase();techPreview(item.url);}});
   const clearTech=()=>{
     $('#technology-form').reset();t('id').value='';t('color').value='#b7ff79';
-    $('#tech-editor-title').textContent='Nova tecnologia';state.techLogo='';releaseImage('techImageObjectUrl');techPreview('');
+    $('#tech-editor-title').textContent='Nova tecnologia';state.techLogo='';releaseImage('techImageObjectUrl');techPreview('');iconCatalog.render();
   };
   function editTech(item){
     clearTech();t('id').value=item.id;t('name').value=item.label;t('category').value=item.cat;
     t('icon').value=item.icon||'';t('color').value=item.color||'#b7ff79';
     t('logo-url').value=item.logoUrl||'';state.techLogo=item.logoUrl||'';techPreview(state.techLogo);
-    $('#tech-editor-title').textContent='Editar tecnologia';t('name').focus();$('.tech-editor-card').scrollIntoView({behavior:'smooth',block:'start'});
+    iconCatalog.render();$('#tech-editor-title').textContent='Editar tecnologia';t('name').focus();$('.tech-editor-card').scrollIntoView({behavior:'smooth',block:'start'});
   }
   function renderTechList(){
     const list=$('#admin-tech-list');list.replaceChildren();
-    if(!state.technologies.length){list.append(create('p','list-empty','Nenhuma tecnologia nesta vitrine.'));return;}
-    state.technologies.forEach((item,i)=>{
+    const query=$('#tech-search').value.trim().toLocaleLowerCase('pt-BR');
+    const category=$('#tech-filter').value;
+    const matches=state.technologies.filter(t=>t.label.toLocaleLowerCase('pt-BR').includes(query) && (category==='all'||t.cat===category));
+    const shown=state.techShowAll?matches:matches.slice(0,6);
+    $('#tech-list-summary').textContent=`${shown.length} de ${matches.length} resultados`;
+    $('#tech-show-all').hidden=matches.length<=6;
+    $('#tech-show-all').textContent=state.techShowAll?'Mostrar menos':'Ver todas as tecnologias';
+    if(!matches.length){list.append(create('p','list-empty','Nenhuma tecnologia nesta vitrine.'));return;}
+    shown.forEach(item=>{
+      const i=state.technologies.findIndex(t=>t.id===item.id);
       const row=create('article','admin-list-item');
       const content=create('div');content.append(create('h3','',item.label),create('p','',`${item.cat} · ${i+1}/${state.technologies.length}`));
       const buttons=create('div','list-actions tech-item-actions');
@@ -162,6 +172,9 @@ export function setupCmsAdmin({request,showStatus}) {
       });buttons.append(edit,del);row.append(content,buttons);list.append(row);
     });
   }
+  $('#tech-search').addEventListener('input',()=>{state.techShowAll=false;renderTechList();});
+  $('#tech-filter').addEventListener('change',()=>{state.techShowAll=false;renderTechList();});
+  $('#tech-show-all').addEventListener('click',()=>{state.techShowAll=!state.techShowAll;renderTechList();});
   t('logo').addEventListener('change',()=>{
     releaseImage('techImageObjectUrl');
     const file=t('logo').files?.[0];if(!file){techPreview(state.techLogo);return;}

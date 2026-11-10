@@ -1,6 +1,7 @@
 import { setupCmsAdmin } from './cms-admin.js';
+import { setupCategoryAdmin } from './category-admin.js';
 const qs = selector => document.querySelector(selector);
-const state = { projects: [], certificates: [], imageUrl: '', pendingPreview: null, certImageUrl: '', certPendingPreview: null };
+const state = { projects: [], certificates: [], projectShowAll:false, certShowAll:false, imageUrl: '', pendingPreview: null, certImageUrl: '', certPendingPreview: null };
 const status = qs('#admin-status');
 const showStatus = (msg, mode = '') => { status.textContent = msg; status.className = `admin-status ${mode}`; };
 const showLogin = () => { qs('#login-panel').hidden = false; qs('#dashboard').hidden = true; };
@@ -21,6 +22,8 @@ const request = async (url, options = {}) => {
   return data;
 };
 const cmsAdmin = setupCmsAdmin({request,showStatus});
+const categoryManager = setupCategoryAdmin({request,showStatus,onUpdate:()=>{renderList();renderCertList();}});
+const categoriesFor = item => Array.isArray(item.categories) && item.categories.length?item.categories:categoryManager.projects.filter(cat=>cat.label===item.category).map(cat=>cat.id);
 const preview = url => {
   const area = qs('#image-preview');
   area.replaceChildren();
@@ -39,6 +42,7 @@ function releasePreview() {
 }
 function clearForm() {
   qs('#project-form').reset();
+  categoryManager.selectProject([]);
   qs('#project-id').value = '';
   qs('#editor-title').textContent = 'Novo projeto';
   state.imageUrl = '';
@@ -49,7 +53,7 @@ function editProject(project) {
   clearForm();
   qs('#project-id').value = project.id;
   qs('#project-title').value = project.title || '';
-  qs('#project-category').value = project.category || 'Outros';
+  categoryManager.selectProject(categoriesFor(project));
   qs('#project-desc').value = project.description || '';
   qs('#project-tags').value = (project.tags || []).join(', ');
   qs('#project-repo').value = project.repository || '';
@@ -64,37 +68,38 @@ function editProject(project) {
 }
 function renderList() {
   qs('#project-count').textContent = String(state.projects.length);
-  const list = qs('#admin-project-list');
-  list.replaceChildren();
-  if (!state.projects.length) {
-    const box = document.createElement('div'); box.className = 'list-empty';
-    box.textContent = 'Ainda não há projetos. Clique em “+ Novo projeto” para cadastrar o primeiro.';
-    list.append(box); return;
-  }
-  state.projects.forEach(project => {
-    const row = document.createElement('article'); row.className = 'admin-list-item';
-    const content = document.createElement('div');
-    const title = document.createElement('h3'); title.textContent = project.title;
-    const meta = document.createElement('p'); meta.textContent = `${project.category} ${project.featured ? '· Em destaque' : ''}`;
-    content.append(title, meta);
-    const actions = document.createElement('div'); actions.className='list-actions';
-    const edit = document.createElement('button'); edit.type='button'; edit.textContent='Editar';
-    edit.addEventListener('click', () => editProject(project));
-    const remove = document.createElement('button'); remove.type='button'; remove.className='delete'; remove.textContent='Excluir';
-    remove.addEventListener('click', async () => {
-      if (!confirm(`Excluir o projeto “${project.title}”? Essa ação não pode ser desfeita.`)) return;
-      try {
-        showStatus('Excluindo projeto...');
-        const result=await request('/.netlify/functions/projects', {method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:project.id})});
-        state.projects = result.projects || [];
-        if (qs('#project-id').value === project.id) clearForm();
-        renderList();showStatus('Projeto excluído. O site público refletirá a mudança na próxima atualização.','success');
-      } catch(e) {showStatus(e.message,'error');}
+  const list=qs('#admin-project-list');list.replaceChildren();
+  const query=qs('#project-search').value.trim().toLocaleLowerCase('pt-BR');
+  const category=qs('#project-filter').value;
+  const matched=state.projects.filter(p=>p.title.toLocaleLowerCase('pt-BR').includes(query) && (category==='all'||categoriesFor(p).includes(category)));
+  const shown=state.projectShowAll?matched:matched.slice(0,5);
+  qs('#project-list-summary').textContent=`${shown.length} de ${matched.length} resultados`;
+  qs('#project-show-all').hidden=matched.length<=5;
+  qs('#project-show-all').textContent=state.projectShowAll?'Mostrar menos':'Ver todos os projetos';
+  if (!shown.length) {const box=document.createElement('p');box.className='list-empty';box.textContent='Nenhum projeto encontrado. Ajuste a busca ou a categoria.';list.append(box);return;}
+  shown.forEach(project=>{
+    const row=document.createElement('article');row.className='admin-list-item';
+    const content=document.createElement('div');
+    const title=document.createElement('h3');title.textContent=project.title;
+    const meta=document.createElement('p');meta.textContent=categoriesFor(project).map(id=>categoryManager.projects.find(c=>c.id===id)?.label).filter(Boolean).join(' · ') + (project.featured?' · Em destaque':'');
+    content.append(title,meta);
+    const actions=document.createElement('div');actions.className='list-actions';
+    const edit=document.createElement('button');edit.type='button';edit.textContent='Editar';edit.addEventListener('click',()=>editProject(project));
+    const remove=document.createElement('button');remove.type='button';remove.className='delete';remove.textContent='Excluir';
+    remove.addEventListener('click',async()=>{
+      if(!confirm(`Excluir o projeto “${project.title}”? Essa ação não pode ser desfeita.`))return;
+      try {showStatus('Excluindo projeto...');const result=await request('/.netlify/functions/projects',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:project.id})});
+        state.projects=result.projects||[];if(qs('#project-id').value===project.id)clearForm();renderList();showStatus('Projeto excluído.','success');
+      }catch(e){showStatus(e.message,'error');}
     });
     actions.append(edit,remove);row.append(content,actions);list.append(row);
   });
 }
+qs('#project-search').addEventListener('input',()=>{state.projectShowAll=false;renderList();});
+qs('#project-filter').addEventListener('change',()=>{state.projectShowAll=false;renderList();});
+qs('#project-show-all').addEventListener('click',()=>{state.projectShowAll=!state.projectShowAll;renderList();});
 async function refresh() {
+  await categoryManager.refresh();
   const [projectsResult, certResult] = await Promise.all([request('/.netlify/functions/projects'), request('/.netlify/functions/certificates')]);
   state.projects = projectsResult.projects || [];
   state.certificates = certResult.certificates || [];
@@ -160,7 +165,9 @@ qs('#project-form').addEventListener('submit',async event=>{
       const url = new URL(image);
       if (!['https:','http:'].includes(url.protocol)) throw new Error('Use uma URL HTTP(S) válida para a imagem.');
     }
-    const body={ id:qs('#project-id').value||undefined, title:qs('#project-title').value, category:qs('#project-category').value,
+    const selectedCategories=categoryManager.selectedProjectIds();
+    if(!selectedCategories.length)throw new Error('Selecione ao menos uma categoria para o projeto.');
+    const body={ id:qs('#project-id').value||undefined, title:qs('#project-title').value, categories:selectedCategories,
       description:qs('#project-desc').value, tags:qs('#project-tags').value.split(',').map(s=>s.trim()).filter(Boolean),
       image, repository:qs('#project-repo').value, demo:qs('#project-demo').value, featured:qs('#project-featured').checked };
     const data=await request('/.netlify/functions/projects',{ method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body) });
@@ -195,7 +202,7 @@ function editCertificate(course) {
   resetCertForm();
   certField('id').value = course.id;
   certField('name').value = course.name || '';
-  certField('group').value = course.group || 'Educação & Idiomas';
+  certField('group').value = course.groupId || categoryManager.certificates.find(c=>c.label===course.group)?.id || ''; 
   certField('org').value = course.org || '';
   certField('hours').value = course.hours || '';
   certField('type').value = course.type || 'Participação';
@@ -208,34 +215,36 @@ function editCertificate(course) {
   qs('.cert-editor-card').scrollIntoView({behavior:'smooth',block:'start'});
 }
 function renderCertList() {
-  qs('#certificate-count').textContent = String(state.certificates.length);
+  qs('#certificate-count').textContent=String(state.certificates.length);
   const list=qs('#admin-cert-list');list.replaceChildren();
-  if (!state.certificates.length) {
-    const blank=document.createElement('p');blank.textContent='Ainda não há formações cadastradas.';list.append(blank);return;
-  }
-  state.certificates.forEach(course => {
+  const query=qs('#cert-search').value.trim().toLocaleLowerCase('pt-BR');
+  const category=qs('#cert-filter').value;
+  const matched=state.certificates.filter(item=>(item.name.toLocaleLowerCase('pt-BR').includes(query)||item.org.toLocaleLowerCase('pt-BR').includes(query)) && (category==='all'||item.groupId===category||categoryManager.certificates.find(c=>c.id===category)?.label===item.group));
+  const shown=state.certShowAll?matched:matched.slice(0,5);
+  qs('#cert-list-summary').textContent=`${shown.length} de ${matched.length} resultados`;
+  qs('#cert-show-all').hidden=matched.length<=5;
+  qs('#cert-show-all').textContent=state.certShowAll?'Mostrar menos':'Ver todas as formações';
+  if(!shown.length){const empty=document.createElement('p');empty.className='list-empty';empty.textContent='Nenhuma formação encontrada.';list.append(empty);return;}
+  shown.forEach(course=>{
     const row=document.createElement('article');row.className='admin-list-item';
-    const content=document.createElement('div');
-    const title=document.createElement('h3');title.textContent=course.name;
-    const meta=document.createElement('p');meta.textContent=`${course.group} · ${course.hours}`;
+    const content=document.createElement('div');const title=document.createElement('h3');title.textContent=course.name;
+    const meta=document.createElement('p');meta.textContent=`${categoryManager.certificates.find(c=>c.id===course.groupId)?.label || course.group} · ${course.hours}`;
     content.append(title,meta);
     const actions=document.createElement('div');actions.className='list-actions';
-    const edit=document.createElement('button');edit.type='button';edit.textContent='Editar';
-    edit.addEventListener('click',()=>editCertificate(course));
+    const edit=document.createElement('button');edit.type='button';edit.textContent='Editar';edit.addEventListener('click',()=>editCertificate(course));
     const remove=document.createElement('button');remove.type='button';remove.className='delete';remove.textContent='Excluir';
     remove.addEventListener('click',async()=>{
-      if (!confirm(`Excluir a formação “${course.name}”?`)) return;
-      try {
-        showStatus('Excluindo formação...');
-        const result=await request('/.netlify/functions/certificates',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:course.id})});
-        state.certificates=result.certificates||[];
-        if(certField('id').value===course.id)resetCertForm();
-        renderCertList();showStatus('Formação excluída da vitrine.','success');
-      } catch(error){showStatus(error.message,'error');}
+      if(!confirm(`Excluir a formação “${course.name}”?`))return;
+      try{showStatus('Excluindo formação...');const result=await request('/.netlify/functions/certificates',{method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:course.id})});
+        state.certificates=result.certificates||[];if(certField('id').value===course.id)resetCertForm();renderCertList();showStatus('Formação excluída.','success');
+      }catch(error){showStatus(error.message,'error');}
     });
     actions.append(edit,remove);row.append(content,actions);list.append(row);
   });
 }
+qs('#cert-search').addEventListener('input',()=>{state.certShowAll=false;renderCertList();});
+qs('#cert-filter').addEventListener('change',()=>{state.certShowAll=false;renderCertList();});
+qs('#cert-show-all').addEventListener('click',()=>{state.certShowAll=!state.certShowAll;renderCertList();});
 function selectTab(name) {
   const panels={content:'#content-panel',technologies:'#technologies-panel',projects:'#projects-panel',certificates:'#certificates-panel'};
   for(const [key,selector] of Object.entries(panels)) {
@@ -281,7 +290,7 @@ qs('#certificate-form').addEventListener('submit',async event=>{
       if(url.protocol!=='https:') throw new Error('Use um link HTTPS para a imagem.');
     }
     const body={id:certField('id').value||undefined,name:certField('name').value,org:certField('org').value,hours:certField('hours').value,
-      group:certField('group').value,type:certField('type').value,description:certField('desc').value,image};
+      groupId:certField('group').value,type:certField('type').value,description:certField('desc').value,image};
     const result=await request('/.netlify/functions/certificates',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     state.certificates=result.certificates||[];renderCertList();resetCertForm();
     showStatus('Formação salva! Atualize a página pública para visualizar.','success');
