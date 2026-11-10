@@ -12,7 +12,7 @@ const particles=read('public/assets/particles.js');
 test('v5.9: botão de tema padronizado nas duas interfaces, com preferência compartilhada',()=>{
   for(const html of [publicHtml,adminHtml]){
     assert.match(html,/id="theme-toggle" class="theme-switch"/);
-    assert.match(html,/v5-9\.css\?v=5\.9\.0/);
+    assert.match(html,/v5-9\.css\?v=5\.10\.0/);
     assert.match(html,/theme-icon-sun/);
     assert.match(html,/theme-icon-moon/);
   }

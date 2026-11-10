@@ -1,136 +1,189 @@
-> **Versão 5.9:** Light/Dark Mode unificado no site e no dashboard, partículas discretas em todas as seções, Contato com janela adaptativa, scrollbar verde e Gmail monocromático. Consulte `ALTERACOES_V5_9_TEMAS_PARTICULAS.md`.
+# Portfólio Anthonny Lucas — Full Stack, IoT e Inteligência Artificial
 
-## Atualização v5.7
+**Versão:** 5.10.0  
+**Autor:** Anthonny Lucas Santos da Silva  
+**Tipo:** aplicação web de portfólio com painel administrativo (CMS)  
+**Publicação prevista:** Netlify, com funções de servidor e Netlify Blobs  
+**Idioma:** português brasileiro
 
-Setas minimalistas fora dos cartões nas três vitrines e gerenciamento dos quatro ícones sociais em **Administração → Páginas & Textos → Redes sociais**. Consulte `ALTERACOES_V5_7_SETAS_E_REDES.md` para exemplos e testes.
+## 1. Apresentação e objetivo
 
-> **Versão 5.6 — Navegação em vidro e ícones de contato:** os três carrosséis públicos agora têm setas translúcidas centralizadas nas bordas laterais. Os contadores permanecem abaixo dos cartões. A sidebar inclui Gmail (usa o e-mail de contato do CMS) e WhatsApp (ative informando um link seguro do tipo `https://wa.me/55DDDNUMERO` em **Painel → Páginas & textos → Conteúdo geral**). Enquanto não houver número configurado, o ícone do WhatsApp aparece desativado. Leia `ALTERACOES_V5_6_VITRINES_CONTATO.md`.
+Esta aplicação foi criada para apresentar a trajetória profissional, os conhecimentos técnicos, os projetos e as formações de Anthonny Lucas em uma interface visualmente interativa. O propósito é facilitar a descoberta do seu trabalho por recrutadores, empresas, parceiros e visitantes, além de permitir que o próprio autor atualize as informações sem editar manualmente o HTML.
 
-> **Atualização v5.1 — Aba Tecnologias:** leia `ALTERACOES_V5_1_TECNOLOGIAS.md` para detalhes de correções, testes e novas categorias. Os SVGs de marcas locais têm seus créditos em `ICONES_CREDITOS.md`.
+O projeto também funciona como uma **base reutilizável de portfólio pessoal**: outra pessoa pode adaptar a identidade visual, os textos, os links, os projetos, as imagens e as categorias ao seu próprio perfil, observadas as condições de atribuição descritas em [`CREDITOS_E_REUTILIZACAO.md`](CREDITOS_E_REUTILIZACAO.md). O nome e os materiais pessoais do autor não devem ser apresentados como se fossem de terceiros.
 
-> **Atualização v5.0:** consulte [ALTERACOES_V5.md](ALTERACOES_V5.md) para catálogo de projetos, categorias múltiplas, listas pesquisáveis, ícones e sidebar editável. As mudanças da versão anterior estão em [ALTERACOES_V4.md](ALTERACOES_V4.md).
+### Casos de uso
 
-# Portfólio profissional — preparado para Netlify
+- **Candidaturas e networking:** apresentar especialidades, projetos e links de contato em um endereço único.
+- **Vitrine técnica:** destacar ferramentas e linguagens em carrossel 3D com filtros e navegação acessível.
+- **Documentação da evolução profissional:** reunir cursos, oficinas e certificados com imagem e descrição.
+- **Gestão de conteúdo:** adicionar, corrigir ou remover registros com autenticação, sem alterar código-fonte ou realizar deploy para cada atualização.
+- **Demonstração de habilidades web:** oferecer um exemplo de front-end responsivo integrado a funções serverless e armazenamento persistente.
 
-Base inicial v5.0, atualizada nesta entrega para v5.6, construída a partir do projeto atualizado `ProjetoP.rar` (HTML/CSS/JavaScript). O nome do site continua sendo **Portfólio**. Mantém a identidade profissional e adiciona uma interface responsiva com animações, carrossel tridimensional de tecnologias com filtros, vitrine horizontal de projetos com dois cartões, categorias dinâmicas e múltiplas, vitrine de 18 formações com filtros e imagens, sidebar com acabamento de vidro e gerenciamento de todo o conteúdo pelo painel administrativo. As listas de projetos, tecnologias e formações possuem busca, filtro, rolagem interna e visualização completa sem alongar a página.
+## 2. Recursos disponíveis
 
-## Estrutura
+| Área | Visitante | Administrador |
+|---|---|---|
+| **Início** | Apresentação, especialidades, links e janela de código animada | Edita textos, títulos e chamadas |
+| **Sobre mim** | Biografia, fotografia e pilares profissionais | Edita textos, imagem e enquadramento |
+| **Tecnologias** | Carrossel 3D, filtros por área, arraste, setas e teclado | Cadastra, altera, exclui, reordena, filtra e categoriza tecnologias; seleciona logotipos |
+| **Projetos** | Catálogo horizontal com dois cartões no desktop, filtros por categoria e links opcionais | Cadastra, edita e exclui projetos; utiliza múltiplas categorias; adiciona imagens e links |
+| **Formações** | Vitrine de certificados com filtros, navegação e visualização de imagens | Edita cursos, instituições, horas, categorias, imagens e descrições |
+| **Contato** | Atalhos E-mail, WhatsApp, GitHub e LinkedIn; formulário | Ajusta os links em Páginas & textos → Redes sociais; edita textos |
+| **Aparência** | Light Mode / Dark Mode, barras de rolagem e partículas animadas | Usa os dois temas também no dashboard |
+| **Identidade** | Sidebar com marca, navegação e links sociais | Ajusta título, subtítulo, logotipo, status, links e textos do rodapé |
 
-- `public/index.html`: site público, compatível com publicação estática.
-- `public/admin/index.html`: formulário de login e painel para editar textos, imagens, tecnologias, projetos e certificados.
-- `public/assets/`: CSS, JavaScript e recursos da interface. Inclui `tech-carousel.js`, `tech-carousel.css` e a pasta `tech-logos` com ícones SVG locais de reserva, além de `cert-carousel.js`, `cert-carousel.css` e imagens disponíveis dos certificados.
-- `netlify/functions/auth.mjs`: autenticação por e-mail e senha com cookie `HttpOnly` assinado.
-- `netlify/functions/projects.mjs`: listagem pública e inclusão/edição/exclusão autenticada de projetos com múltiplas categorias.
-- `netlify/functions/categories.mjs`: cadastro de categorias para projetos e formações, com identificadores estáveis, migração de dados anteriores e proteção contra exclusão de categorias em uso.
-- `public/assets/project-carousel.js`: vitrine de dois projetos com filtros, setas e arraste.
-- `public/assets/category-admin.js` e `tech-icon-catalog.js`: editor de categorias e catálogo pesquisável de logotipos.
-- `netlify/functions/certificates.mjs`: lista pública e edição autenticada das formações e de suas imagens.
-- `netlify/functions/content.mjs` e `netlify/functions/technologies.mjs`: CMS de seções e catálogo editável com escrita autenticada.
-- `public/assets/site-schema.js` e `public/assets/cms-admin.js`: campos permitidos e interface do editor.
-- `netlify/functions/media.mjs`: upload de imagens até 4 MB e entrega das imagens armazenadas.
-- `netlify/functions/lib/security.mjs`: validação e segurança.
-- `netlify.toml`: configurações da Netlify (publicação, funções, cabeçalhos de proteção).
+Os quatro links da seção **Contato** usam os mesmos campos de configuração da sidebar. A versão 5.10 corrige o layout quebrado da página Início introduzido pela camada de partículas: o título voltou ao primeiro bloco da grade, e a ilustração ao segundo. A seção Contato passou a oferecer também GitHub e LinkedIn, mantendo E-mail e WhatsApp.
 
-## Publicar na Netlify: passo a passo
+### Conteúdo inicial e limitações editoriais
 
-**Recomendado: conectar um repositório GitHub** para que a Netlify execute a instalação das dependências e publique automaticamente os arquivos do site e as funções.
+O código contém **dados iniciais demonstrativos**, disponíveis sem Netlify Blobs: 25 tecnologias, um conjunto inicial de projetos e 18 formações. Alguns projetos têm ilustrações conceituais, não capturas de implementações verificadas. Antes de divulgar o site como currículo ou prova de trabalho, revise o texto de cada registro e substitua imagens ilustrativas por evidências próprias quando couber. Materiais identificados como internos ou confidenciais não devem ser publicados sem permissão.
 
-1. No computador, extraia este ZIP e entre na pasta extraída (aquela onde estão `package.json` e `netlify.toml`).
-2. Suba **o conteúdo dessa pasta** para um repositório GitHub privado (ou público, sem qualquer arquivo `.env`).
-3. Entre em https://app.netlify.com/ e escolha **Add new project → Import an existing project**; conecte o repositório.
-4. Use a raiz do projeto como base; o `netlify.toml` já define a pasta de publicação `public`, o comando de build e a pasta das funções. Não selecione `public` como diretório base.
-5. Faça o primeiro deploy. O site público já funcionará; o painel mostrará que ainda faltam credenciais.
-6. Para ativar o painel, configure no site da Netlify, em **Project configuration → Environment variables**, as variáveis `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH` e `SESSION_SECRET`. Escolha escopo **Functions** ou **All** e ambiente **Production**; faça novo deploy após configurar.
-7. Gere valores seguros localmente, na raiz do projeto, com `node scripts/gerar-credenciais.mjs`. Este script pede o e-mail e a senha, produz o hash e um segredo; **não salva a senha em arquivos**. Utilize o e-mail administrativo de sua escolha e defina uma senha longa e exclusiva. O gerador alerta sobre senhas fracas. **É altamente recomendado substituí-la por uma senha longa e exclusiva antes de tornar o painel público.** Nunca inclua senhas ou valores reais de configuração no repositório.
-8. Acesse `https://SEU-SITE.netlify.app/admin/` (ou clique no pequeno cadeado no rodapé do portfólio). Entre com o e-mail e senha definidos; nas abas **Páginas & textos**, **Tecnologias**, **Projetos** e **Formações e certificados**, edite o conteúdo do portfólio. O visitante verá as atualizações após recarregar o site.
-9. Na aba **Forms** da Netlify, habilite **Form detection**, se necessário, e republique para ativar o formulário de contato. As mensagens aparecerão no painel de formulários da Netlify. Configure notificações, se desejar recebê-las por e-mail.
+## 3. Arquitetura e tecnologias
 
-**Importante:** upload por simples arrastar a pasta `public` no Netlify Drop é suficiente para visualizar o site, mas **não** instala nem publica as funções necessárias ao painel. Para o painel completo, use o deploy conectado ao Git ou o Netlify CLI. Os dados dos projetos, das formações e suas imagens ficam em `Netlify Blobs` site-wide, preservados entre deploys da mesma aplicação.
+A aplicação mantém uma arquitetura estática com JavaScript modular e funções serverless, sem framework de interface obrigatório.
 
-## Testar localmente
+```text
+public/
+  index.html                 Site público
+  admin/index.html           Dashboard administrativo
+  obrigado/index.html        Confirmação do formulário
+  assets/
+    style.css, v5*.css       Layout, temas e acabamento visual
+    main.js                  Inicialização do site público
+    admin.js                 Inicialização do dashboard
+    cms-admin.js             Editor de tecnologias, projetos e formações
+    content-client.js        Aplicação de textos/links configuráveis
+    site-schema.js           Contrato dos campos editáveis
+    *-carousel.js            Navegação das vitrines
+    particles.js             Rede visual de partículas
+    tech-icon-catalog.js     Catálogo de logotipos
+    data.js                  Conteúdo inicial/fallback
+netlify/functions/
+  auth.mjs                   Autenticação e sessão
+  content.mjs                Textos e links do site
+  technologies.mjs           Tecnologias
+  projects.mjs               Projetos
+  certificates.mjs           Formações
+  categories.mjs             Catálogos de categorias
+  media.mjs                  Upload e leitura de imagens
+  lib/                       Autorização, armazenamento e categorias
+scripts/
+  gerar-credenciais.mjs      Gerador local do hash da senha e segredo
+tests/                      Testes automatizados e simulações do servidor
+netlify.toml                  Configuração de deploy e cabeçalhos
+```
 
-Requisitos: Node.js 22.13+ e npm.
+**Tecnologias principais:** HTML5, CSS3, JavaScript ES Modules, Node.js (funções da Netlify), Netlify Functions, Netlify Blobs e Netlify Forms. Carrosséis, seleção de temas e animações são implementados com CSS/JavaScript, sem dependência de React ou de outro framework para montar as páginas.
+
+### Fluxo de conteúdo
+
+1. O navegador apresenta a versão inicial da página a partir de `public/`.
+2. O site solicita conteúdo, projetos, tecnologias, certificados e categorias aos endpoints `/.netlify/functions/...`.
+3. Se houver dados persistidos em **Netlify Blobs**, eles substituem o conteúdo inicial; se o serviço não estiver disponível na prévia estática, o site mantém os dados locais de fallback.
+4. O painel administrativo autentica o usuário no servidor; alterações de dados exigem uma sessão válida.
+5. Depois de salvar, o site público recupera as informações atualizadas ao ser recarregado. **Salvar dados de conteúdo não exige novo deploy**; alterar arquivos da aplicação exige publicá-los novamente.
+
+## 4. Preparação para executar
+
+**Pré-requisitos:** Node.js **22.13 ou superior**, npm e uma conta Netlify para utilizar autenticação, upload e persistência reais. O Git é recomendado para publicação contínua.
+
+Na pasta raiz (onde estão `package.json` e `netlify.toml`), execute:
 
 ```bash
 npm install
 npm run dev
 ```
 
-Abra `http://localhost:8888/`. Para testar o login local, adicione as variáveis ao ambiente do terminal antes de iniciar (`netlify dev` também suporta ambiente local configurado), **não** deixe credenciais dentro de arquivos que vão para o Git. Um servidor simples de HTML não executará as funções; nesse caso, a galeria exibirá os quatro projetos iniciais e o painel não poderá autenticar.
+Com o ambiente Netlify Dev iniciado, abra `http://localhost:8888/`. O painel fica em `http://localhost:8888/admin/`.
 
-Verificações de sintaxe:
+### Prévia sem backend
+
+Para visualizar **somente o site público**, use `PREVISUALIZAR_SITE.bat` no Windows com Python instalado, ou:
+
+```bash
+python3 -m http.server 8000 --directory public
+```
+
+Nessa modalidade, entre em `http://localhost:8000/`. Não existe servidor de autenticação/Blobs; o login e a gravação de conteúdo não funcionarão. Não use essa prévia para testar o dashboard.
+
+## 5. Configurar o acesso administrativo
+
+Acesse a pasta raiz em um terminal e execute:
+
+```bash
+node scripts/gerar-credenciais.mjs
+```
+
+Use uma **senha forte e exclusiva**. O gerador produz os valores necessários sem colocar a senha em texto puro no código:
+
+- `ADMIN_EMAIL`: endereço de login do administrador.
+- `ADMIN_PASSWORD_HASH`: hash da senha (scrypt).
+- `SESSION_SECRET`: segredo para assinatura das sessões (não compartilhar).
+
+Configure essas três variáveis em **Netlify → Project configuration → Environment variables**, garantindo disponibilidade para Functions no ambiente Production; depois faça novo deploy. O painel fica em `/admin/` ou no cadeado discreto do rodapé do site.
+
+**Importante:** ocultar o cadeado não é segurança; a proteção depende da sessão verificada no servidor. Não coloque credenciais nos arquivos `public/`, em repositórios públicos ou dentro deste ZIP. Veja [`CONFIGURAR_LOGIN_NETLIFY.md`](CONFIGURAR_LOGIN_NETLIFY.md) para problemas comuns de login e publicação.
+
+## 6. Publicação na Netlify
+
+1. Crie um repositório Git com o **projeto inteiro**, preservando `netlify.toml`, `package.json`, `public/` e `netlify/functions/`.
+2. Na Netlify, importe o repositório. `netlify.toml` define `publish = "public"` e a pasta de funções.
+3. Configure as variáveis secretas descritas acima e execute o deploy.
+4. Acesse o site público e confirme que os endpoints `/.netlify/functions/auth` e `/.netlify/functions/content` retornam JSON; a página de login não deve retornar HTML como resposta de uma API.
+5. Em **Forms**, configure detecção de formulários e notificações, quando necessário. Realize um envio de teste antes de considerar o formulário operacional.
+6. Se estiver **atualizando o mesmo site** na Netlify, preserve a configuração e o contexto de dados armazenados; não troque de site sem planejar migração de Blobs.
+
+**Atenção:** arrastar apenas a pasta `public` para um host estático não publica as funções necessárias para administração. Para uma instalação completa, use o Git integrado à Netlify ou o Netlify CLI.
+
+## 7. Fluxo básico do administrador
+
+1. Entre em `/admin/` com as credenciais configuradas no servidor.
+2. Abra **Páginas & textos** para alterar hero, biografia, títulos, links, textos de contato e identificação da sidebar. Os links de redes sociais na seção Contato seguem as mesmas URLs cadastradas para a sidebar.
+3. Abra **Tecnologias** para localizar por nome/categoria, usar o catálogo de logotipos e cadastrar áreas e ferramentas; a lista possui rolagem interna.
+4. Abra **Projetos** para adicionar registros, associar várias categorias, anexar uma imagem e informar links de demonstração ou repositório, se existirem.
+5. Abra **Formações e certificados** para cadastrar e editar formações, categorias e imagens.
+6. Salve e aguarde a confirmação positiva do servidor; somente então a interface retorna ao topo. Em caso de erro, a página mantém sua posição e exibe o aviso correspondente.
+7. Abra o site público em outra aba e recarregue para verificar o resultado.
+
+Os campos de texto são tratados como texto, não como HTML executável. Campos de imagem e links possuem validações específicas no servidor. Uploads aceitam JPG, PNG, WebP e GIF com até **4 MB** por arquivo.
+
+## 8. Acessibilidade e desempenho
+
+- Navegação com teclado para carrosséis e botões onde implementado.
+- Layout adaptado para desktop e celular.
+- Preferência de tema compartilhada entre portfólio e painel, armazenada localmente no navegador.
+- Partículas desenhadas em `<canvas>` atrás do conteúdo, sem capturar cliques; respeitam `prefers-reduced-motion` e reduzem processamento em abas ocultas.
+- Contraste entre texto e painéis ajustado para Light Mode e Dark Mode.
+- Ícones sociais identificados por rótulos acessíveis.
+- O formulário de contato tem campos obrigatórios e mecanismo honeypot.
+
+## 9. Testes e verificação de qualidade
 
 ```bash
 npm run check
-npm run test
+npm test
 ```
 
-## Cuidados e funcionalidades
+- `npm run check`: verifica a sintaxe de módulos JavaScript e funções Node.
+- `npm test`: executa a suíte de testes incluída no projeto. Alguns testes usam um armazenamento **simulado**, sem a Netlify real.
+- Para verificar a interface, teste a seção Início em 1440 px, 1024 px e 390 px, tanto em modo claro como escuro. Em telas largas, o conteúdo deve ficar **à esquerda**, a ilustração **à direita** e nenhum texto pode ser cortado na lateral. Repita os testes para os quatro atalhos de Contato.
 
-- O cadeado é **discreto, não é um mecanismo de segurança**. As ações de gravação exigem autenticação no servidor.
-- A senha fica protegida por hash `scrypt` (não texto puro) em variáveis da Netlify; o cookie de sessão é assinado, `HttpOnly`, `SameSite=Strict` e `Secure` em HTTPS.
-- As requisições de gravação são verificadas pela origem, autenticação e validação dos dados.
-- Imagens aceitas: JPG, PNG, WebP e GIF, até 4 MB. Não inclua PDF com CPF ou informações sigilosas em links públicos.
-- O painel suporta criar, editar e excluir projetos. **Exclusão de projetos não apaga automaticamente imagens já carregadas**; para limpeza de imagens órfãs, use o painel de Netlify Blobs ou implemente um gerenciador de mídia posteriormente.
-- O arquivo de formações já inclui **18 atividades** compiladas dos certificados disponibilizados. Como os documentos do Startup Way têm marcação interna/confidencial, o site inclui apenas informações públicas resumidas, **não publica o PDF**.
-- A galeria inicia com quatro estudos/propostas conhecidos das conversas sobre seu portfólio (Smart Solar Home, AQUA, Automação de Certificados e Curvas Paramétricas). São descrições iniciais e **ilustrações conceituais, não capturas de tela**. Revise cada item no painel antes da publicação definitiva. O painel permite alterar ou remover todos; nenhum link fictício foi criado. A versão original continha cards com placeholders e links `#`.
-- Botões de tecnologias e categorias, modo claro/escuro, animações suaves com suporte a `prefers-reduced-motion`, navegação por teclado e formulário de contato acessível.
-- A sessão expira após 12 horas. Uma mudança de `SESSION_SECRET` invalida sessões anteriores. Falhas de login têm limite básico de tentativas; para exposição pública com alto risco, recomenda-se complementar com autenticação gerenciada e proteção de borda.
-- Ainda falta configurar as variáveis de autenticação **diretamente no ambiente da Netlify**, além de revisar seus projetos reais, seus links, sua foto de perfil e os textos antes de publicar.
+Consulte o documento completo [`GUIA_FUNCIONALIDADES_E_TESTES.md`](GUIA_FUNCIONALIDADES_E_TESTES.md) para os procedimentos, cenários de falha, expectativas e resultados que ainda dependem da Netlify publicada.
 
-## Referências oficiais
+## 10. Reutilização, créditos e conteúdo de terceiros
 
-- Netlify Functions: https://docs.netlify.com/build/functions/get-started/
-- Netlify Blobs: https://docs.netlify.com/build/data-and-storage/netlify-blobs/
-- Netlify Forms: https://docs.netlify.com/manage/forms/setup/
-- Deploy com repositório Git: https://docs.netlify.com/deploy/create-deploys/
+Os termos de reutilização do código e o formato de atribuição estão em [`CREDITOS_E_REUTILIZACAO.md`](CREDITOS_E_REUTILIZACAO.md). O projeto foi desenvolvido para ser adaptável, mas **a autorização de reutilizar o código não transfere direitos sobre fotografias, certificados, logotipos, fontes ou serviços de terceiros**. Consulte também [`ICONES_CREDITOS.md`](ICONES_CREDITOS.md).
 
-## Pré-visualização rápida sem instalar dependências
+**Autor:** Anthonny Lucas Santos da Silva.  
+**Portfólio de referência:** https://projetop-anthonny.netlify.app/
 
-- No Windows, execute `PREVISUALIZAR_SITE.bat`. É necessário ter Python instalado (comando `py` ou `python`). O navegador abrirá o site público em `http://localhost:8000`.
-- Em macOS/Linux, estando na raiz do projeto, execute `python3 -m http.server 8000 --directory public` e abra `http://localhost:8000`.
-- O modo de prévia estática **não executa funções de autenticação, não permite salvar novos projetos e não recebe formulários**; para esses recursos, faça o deploy completo na Netlify ou use `npm run dev`.
+## 11. Documentos adicionais
 
-### Conferência antes da publicação
+- [`GUIA_FUNCIONALIDADES_E_TESTES.md`](GUIA_FUNCIONALIDADES_E_TESTES.md) — inventário funcional e plano de teste manual/automatizado.
+- [`CREDITOS_E_REUTILIZACAO.md`](CREDITOS_E_REUTILIZACAO.md) — créditos e condições para reutilização.
+- [`CONFIGURAR_LOGIN_NETLIFY.md`](CONFIGURAR_LOGIN_NETLIFY.md) — autenticação e diagnóstico.
+- [`ICONES_CREDITOS.md`](ICONES_CREDITOS.md) — referências do catálogo de ícones.
+- `ALTERACOES_V*.md` — registro das evoluções anteriores do projeto.
 
-Revise os quatro projetos iniciais: os títulos foram recuperados de trabalhos discutidos anteriormente, mas não havia código ou capturas de tela desses projetos no ZIP original. Substitua detalhes e imagens conceituais por materiais próprios se desejar documentar implementações reais. Verifique também o e-mail de contato e os links do LinkedIn e do GitHub.
-
-## Revisão visual pendente de novos conteúdos — seção Tecnologias
-
-A grade estática com 25 competências foi substituída por uma **vitrine 3D estilo coverflow**, com cartão central em destaque e laterais em perspectiva. Navegação via setas, clique nas cartas vizinhas, arrastar com mouse ou dedo e teclado (←/→, Home/End). Os filtros por área continuam funcionando. Refração suave, bordas iluminadas e reflexo discreto sob os ícones preservam contraste e legibilidade em claro/escuro. Há fallback local SVG para as marcas obtidas de um CDN, evitando ícones quebrados quando o dispositivo está offline. Usuários com preferência por movimento reduzido recebem transições praticamente instantâneas.
-
-O carrossel faz parte deste pacote atualizado. Estas alterações **ainda não foram implantadas na Netlify**. O acesso discreto pelo pequeno cadeado no canto inferior direito do rodapé foi preservado sem alterações. O código contém a lógica de autenticação e edição, mas o login só estará ativo após a configuração das três variáveis de ambiente na Netlify.
-
-## Vitrine de formações — atualização v3
-
-- Os cartões usam o visual já existente, mas agora há **2 cursos visíveis no desktop e 1 no celular**. Navegue com setas, arraste ou deslize, e escolha uma categoria.
-- Os 18 cursos possuem instituição, categoria, carga horária, natureza (curso concluído, participação, oficina etc.) e descrição breve.
-- Imagens reais dos certificados **Catalisa ICT Jr., Introdução ao Desenvolvimento Web, Fibras Ópticas e Wazuh** foram adicionadas com base nos documentos compartilhados. Os demais têm placeholders profissionais até que a imagem seja cadastrada.
-- O documento do **Startup Way é marcado como Confidencial / Informação Interna**; sua imagem não acompanha a versão pública. Antes de publicá-la manualmente, verifique autorização de divulgação.
-- Para editar uma imagem depois de publicar, abra o painel → **Formações e certificados** → **Editar** → escolha o arquivo JPG/PNG/WebP/GIF até 4 MB → **Salvar formação**. Atualize a página pública.
-- O upload de imagens pelo painel requer **Netlify Functions + Netlify Blobs** ativos no projeto publicado; abrir um arquivo HTML localmente não ativa o servidor.
-
-## Diagnóstico de erro no login
-
-Se aparecer “operação inválida” ou falha no login, consulte `CONFIGURAR_LOGIN_NETLIFY.md`. O endereço `/.netlify/functions/auth` deve retornar **JSON**, não HTML ou 404. Quando `configured` é `false`, configure as três variáveis da Netlify; quando `configured` é `true` mas o login falha com 401, revise e-mail e senha usados para gerar o hash. Não há login offline válido em um site estático simples.
-
-
-## Layout de Tecnologias — v5.2
-
-O botão **Ver todas as tecnologias** amplia a lista na coluna esquerda do painel administrativo, aproveitando a altura do formulário à direita sem excedê-la. Consulte `ALTERACOES_V5_2_LAYOUT_TECNOLOGIAS.md` para detalhes e testes.
-
-
-## Ajuste v5.4 — Listas expansíveis no painel
-Ao clicar em “Ver todas as tecnologias” ou “Ver todas as formações”, as listas superiores ocupam o espaço disponível em vez de ficarem presas à altura compacta anterior. Para detalhes, veja `ALTERACOES_V5_4_EXPANSAO_LISTAS.md`.
-
-
-### Atualização 5.5 — Retorno e notificações
-- Botão **Voltar ao site** com contorno, destaque e foco acessível.
-- Depois de qualquer alteração persistida no servidor (textos, categorias, tecnologias, projetos e formações), o painel volta suavemente ao topo e exibe um aviso de sucesso.
-- Se houver erro, a página permanece na posição atual e mostra um aviso de falha; os dados não são anunciados como salvos.
-- Mensagens temporárias como “Enviando imagem” e login não provocam rolagem automática.
-
-
-## Atualização v5.8 — Contato
-
-O endereço de contato deixou de ser exibido diretamente na seção Contato. No lugar, há os links **E-mail** (composição do Gmail) e **WhatsApp**. Os mesmos links também estão nos ícones da sidebar e permanecem editáveis em **Admin > Páginas & Textos > Redes sociais**. O formulário continua usando o Netlify Forms e ganhou efeito de vidro. Uma animação de código substitui a estrela. Detalhes e passos de validação: `ALTERACOES_V5_8_CONTATO.md`.
+> **Estado de validação da versão 5.10:** foi verificada a estrutura HTML/CSS corrigida, a sintaxe dos módulos e os testes automatizados locais. A publicação, a autenticação real, a persistência e o recebimento de formulários devem ser conferidos no ambiente Netlify do responsável pelo site.

@@ -53,7 +53,13 @@ html[data-theme="light"] .contact-section{background:radial-gradient(ellipse at 
 .hero,.content-section,.admin-wrap{position:relative;isolation:isolate}
 .section-particles{position:absolute;top:0;left:0;z-index:0;pointer-events:none!important;user-select:none;opacity:.55;contain:strict}
 html[data-theme="light"] .section-particles{opacity:.39}
-.hero>:not(.section-particles),.content-section>:not(.section-particles),.admin-wrap>:not(.section-particles){position:relative;z-index:1}
+/* Não transformar todos os filhos diretos do Hero em itens da grade.
+   v5.9 mudou hero-glow e scroll-cue (originalmente absolutos) para relative,
+   empurrando o texto para a coluna da direita e o código para a próxima linha. */
+.hero>.hero-copy,.hero>.hero-art{position:relative;z-index:1}
+.hero>.hero-glow{position:absolute;z-index:0}
+.hero>.scroll-cue{position:absolute;z-index:2}
+.content-section>:not(.section-particles),.admin-wrap>:not(.section-particles){position:relative;z-index:1}
 /* Campos e cartões continuam legíveis mesmo na presença da rede. */
 .admin-body{background:radial-gradient(circle at 78% 3%,color-mix(in srgb,var(--purple) 10%,transparent),transparent 42%),var(--bg)}
 html[data-theme="light"] .admin-body .admin-card,
