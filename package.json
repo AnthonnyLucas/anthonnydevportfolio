@@ -1,6 +1,6 @@
 {
   "name": "portfolio-anthonny-netlify",
-  "version": "5.11.0",
+  "version": "5.12.0",
   "private": true,
   "type": "module",
   "engines": {
@@ -8,8 +8,8 @@
   },
   "scripts": {
     "dev": "netlify dev",
-    "check": "node --check public/assets/main.js && node --check public/assets/admin.js && node --check public/assets/admin-feedback.js && node --check public/assets/cms-admin.js && node --check public/assets/content-client.js && node --check public/assets/site-schema.js && node --check public/assets/tech-carousel.js && node --check public/assets/cert-carousel.js && node --check netlify/functions/auth.mjs && node --check netlify/functions/projects.mjs && node --check netlify/functions/media.mjs && node --check netlify/functions/certificates.mjs && node --check netlify/functions/content.mjs && node --check netlify/functions/technologies.mjs && node --check netlify/functions/lib/security.mjs && node --check scripts/gerar-credenciais.mjs && node --check public/assets/project-carousel.js && node --check public/assets/category-admin.js && node --check public/assets/tech-icon-catalog.js && node --check netlify/functions/categories.mjs && node --check netlify/functions/lib/catalogs.mjs && node --check public/assets/theme-controls.js && node --check public/assets/particles.js",
-    "test": "node --experimental-loader ./tests/mock-loader.mjs --test ./tests/api.test.mjs ./tests/static.test.mjs ./tests/layout-expansion.test.mjs ./tests/admin-feedback.test.mjs ./tests/social-v57.test.mjs ./tests/contact-v58.test.mjs ./tests/theme-v59.test.mjs ./tests/v5-10.test.mjs ./tests/cert-theme-v511.test.mjs"
+    "check": "node --check public/assets/main.js && node --check public/assets/admin.js && node --check public/assets/admin-feedback.js && node --check public/assets/cms-admin.js && node --check public/assets/content-client.js && node --check public/assets/site-schema.js && node --check public/assets/tech-carousel.js && node --check public/assets/cert-carousel.js && node --check netlify/functions/auth.mjs && node --check netlify/functions/projects.mjs && node --check netlify/functions/media.mjs && node --check netlify/functions/certificates.mjs && node --check netlify/functions/content.mjs && node --check netlify/functions/technologies.mjs && node --check netlify/functions/lib/security.mjs && node --check scripts/gerar-credenciais.mjs && node --check public/assets/project-carousel.js && node --check public/assets/category-admin.js && node --check public/assets/tech-icon-catalog.js && node --check netlify/functions/icon-library.mjs && node --check netlify/functions/categories.mjs && node --check netlify/functions/lib/catalogs.mjs && node --check public/assets/theme-controls.js && node --check public/assets/particles.js",
+    "test": "node --experimental-loader ./tests/mock-loader.mjs --test ./tests/api.test.mjs ./tests/static.test.mjs ./tests/layout-expansion.test.mjs ./tests/admin-feedback.test.mjs ./tests/social-v57.test.mjs ./tests/contact-v58.test.mjs ./tests/theme-v59.test.mjs ./tests/v5-10.test.mjs ./tests/cert-theme-v511.test.mjs ./tests/icon-catalog-v512.test.mjs"
   },
   "dependencies": {
     "@netlify/blobs": "^11.1.8"

@@ -189,3 +189,12 @@ Os termos de reutilização do código e o formato de atribuição estão em [`C
 - `ALTERACOES_V*.md` — registro das evoluções anteriores do projeto.
 
 > **Estado de validação da versão 5.10:** foi verificada a estrutura HTML/CSS corrigida, a sintaxe dos módulos e os testes automatizados locais. A publicação, a autenticação real, a persistência e o recebimento de formulários devem ser conferidos no ambiente Netlify do responsável pelo site.
+
+
+## Atualização v5.12 — Biblioteca ampliada de tecnologias
+
+O painel **Tecnologias → Catálogo de logotipos** carrega sob demanda um índice de nomes de Devicon, SVG Logos e Simple Icons via Iconify, mantendo as 156 opções anteriores como reserva. Escolha a biblioteca no filtro, pesquise pelo nome e clique no símbolo para preenchimento do formulário. O campo de URL e o upload manual continuam disponíveis.
+
+Ao navegar com internet, o acervo oferece milhares de símbolos e logotipos. Para evitar lentidão, a interface renderiza somente 48 opções por vez e carrega imagens sob demanda; os índices de nomes ficam armazenados por sete dias no navegador. Se houver falha da API externa, a interface sinaliza o problema e mostra o botão para tentar novamente.
+
+A Netlify Function `icon-library.mjs` oferece uma recuperação pelo próprio domínio, limitada às três coleções permitidas. A função requer acesso à internet para obter os metadados. Confira **`ICONES_CREDITOS.md`** e **`ALTERACOES_V5_12_CATALOGO_ICONES.md`** para fontes, licenças, dependências e roteiro de testes.

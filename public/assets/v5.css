@@ -377,3 +377,14 @@
     overflow: visible;
   }
 }
+
+/* v5.12 - Biblioteca ampliada de logotipos: filtros de origem e metadados */
+#technologies-panel .icon-catalog-sources{display:flex;align-items:center;gap:10px;margin:8px 0 12px}
+#technologies-panel .icon-catalog-sources label{margin:0;flex-shrink:0;font-size:12px}
+#technologies-panel #tech-icon-source{min-width:0;flex:1;max-width:300px;border:1px solid var(--line);border-radius:9px;background:var(--bg2);color:var(--text);padding:10px 12px;font:500 12px var(--font)}
+#technologies-panel #tech-icon-status{line-height:1.55;margin:5px 0 10px}
+#technologies-panel #tech-icon-retry{margin:0 0 12px}
+#technologies-panel .catalog-logo-source{font:500 9px var(--font);opacity:.7;text-align:center;line-height:1.25}
+#technologies-panel .catalog-logo-choice{min-height:100px;gap:5px}
+#technologies-panel .catalog-logo-choice img{max-width:36px;max-height:34px}
+@media(max-width:530px){#technologies-panel .icon-catalog-sources{align-items:stretch;flex-direction:column}#technologies-panel #tech-icon-source{max-width:none;width:100%}}
