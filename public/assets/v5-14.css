@@ -1,0 +1,18 @@
+/* v5.14 — tecnologias vinculadas a cada projeto; claro/escuro por variáveis globais. */
+.project-tech-picker{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;padding:12px;max-height:240px;overflow:auto;scrollbar-width:thin;scrollbar-color:var(--green) transparent;border:1px solid var(--line);background:var(--bg2);border-radius:12px;margin-bottom:3px}
+.project-tech-check{display:flex;gap:8px;align-items:center;min-width:0;padding:9px 10px;margin:0!important;font:600 11px var(--font);border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:9px;cursor:pointer;transition:border-color .2s,background .2s}
+.project-tech-check.is-selected{border-color:color-mix(in srgb,var(--green) 64%,var(--line));background:color-mix(in srgb,var(--green) 9%,var(--panel))}
+.project-tech-check input{margin:0;accent-color:var(--green);width:auto;flex:0 0 auto}
+.project-tech-check span{overflow-wrap:anywhere}
+.project-tech-check small{color:var(--muted);font-size:9px}
+.project-tech-empty{grid-column:1/-1;color:var(--muted);font-size:11px;padding:10px;margin:0}
+.project-tech-section{border-top:1px solid var(--line);padding-top:13px;margin:11px 0 10px}
+.project-tech-heading{font:700 10px var(--display);letter-spacing:.11em;text-transform:uppercase;color:var(--text);margin:0 0 9px}
+.project-tech-list{display:flex;flex-wrap:wrap;gap:7px}
+.project-tech-pill{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;max-width:100%;border:1px solid color-mix(in srgb,var(--green) 34%,var(--line));background:color-mix(in srgb,var(--green) 8%,var(--panel));border-radius:999px;color:var(--text);font:650 11px var(--font)}
+.project-tech-pill>span:last-child{overflow-wrap:anywhere}
+.project-tech-logo{width:17px;height:17px;object-fit:contain;flex:none}
+.project-tech-dot{color:var(--green);font-size:10px}
+.project-card .project-tags{margin-top:7px}
+@media(max-width:540px){.project-tech-picker{grid-template-columns:1fr}.project-tech-pill{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.project-tech-check{transition:none}}

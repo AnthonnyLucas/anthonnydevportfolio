@@ -1,6 +1,6 @@
 # Guia de funcionalidades e plano de testes — Portfólio Anthonny Lucas
 
-**Versão-alvo:** 5.10.0  
+**Versão-alvo:** 5.14.0  
 **Objetivo:** documentar os módulos existentes e fornecer um roteiro reproduzível para validação local e após a publicação na Netlify.
 
 > **Legenda:** **Automatizável localmente** = pode ser verificado com testes de código ou simulações; **Requer Netlify** = depende do ambiente publicado, das credenciais e do armazenamento real; **Visual** = requer inspeção em navegador e diferentes tamanhos de tela. A existência de um roteiro de teste **não significa que ele já tenha sido executado**.
@@ -48,7 +48,7 @@
 ### FT-05 — Catálogo de projetos
 
 - **Ações:** percorrer o catálogo, filtrar por categoria, abrir links configurados.
-- **Esperado:** dois cartões por vez em desktop, um em telas pequenas; projeto com mais de uma categoria aparece em todos os filtros pertinentes. Links inválidos não devem ser apresentados como válidos.
+- **Esperado:** dois cartões por vez em desktop, um em telas pequenas; projeto com mais de uma categoria aparece em todos os filtros pertinentes. Dentro de cada cartão, as tecnologias e ferramentas vinculadas são exibidas separadamente das categorias, sem duplicar marcadores antigos. Links inválidos não devem ser apresentados como válidos.
 - **Tipo:** Visual / integração com Netlify.
 
 ### FT-06 — Formações e certificados
@@ -103,8 +103,8 @@
 
 ### ADM-04 — Projetos e categorias múltiplas
 
-- **Ações:** cadastrar projeto com várias categorias, alterar título, imagem, descrição, tags e URLs; buscar por nome/categoria; excluir.
-- **Esperado:** edição persiste, filtros públicos incluem o projeto em todas as áreas associadas e versões antigas com uma categoria continuam visíveis.
+- **Ações:** cadastrar projeto com várias categorias, alterar título, imagem, descrição, tecnologias vinculadas e URLs; buscar por nome/categoria; excluir.
+- **Esperado:** edição persiste, filtros públicos incluem o projeto em todas as áreas associadas; ferramentas selecionadas aparecem apenas no projeto correspondente; versões antigas com uma categoria continuam visíveis.
 - **Casos negativos:** formulário sem título ou descrição, categoria inexistente, exclusão sem sessão.
 - **Tipo:** API / interface / Netlify.
 
@@ -204,3 +204,18 @@ O projeto inclui testes das APIs e regras de autenticação/categorias, controle
 ## 9. Histórico e evidências
 
 O registro incremental das alterações fica nos arquivos `ALTERACOES_V*.md`. Para a versão 5.10, consulte `ALTERACOES_V5_10_RESTAURACAO_INICIO.md`. Pré-visualizações em `screens/`, quando incluídas, representam inspeção local e **não** prova de funcionamento na Netlify publicada.
+
+
+### ADM-04-A — Tecnologias por projeto (v5.14)
+
+- **Pré-requisito:** cadastrar pelo menos duas tecnologias em Administração → Tecnologias e verificar que elas aparecem na vitrine pública de competências.
+- **Seleção:** criar um projeto, pesquisar pelo nome, marcar duas ou mais tecnologias e salvar; abrir o projeto na página pública. Esperado: etiquetas com nomes e logotipos (quando cadastrados) sob o título **Tecnologias e ferramentas** dentro do cartão correto.
+- **Isolamento:** associar Python ao Projeto A e Java ao Projeto B. Esperado: Java não aparece no Projeto A e Python não aparece no Projeto B, a menos que ambos sejam explicitamente selecionados.
+- **Persistência:** editar Projeto A e verificar as escolhas pré-marcadas; acrescentar outra tecnologia, salvar e recarregar o painel.
+- **Atualização automática:** na seção Tecnologias, cadastrar Angular, retornar à aba Projetos e conferir que Angular aparece no seletor. Renomeá-la e conferir que os projetos já vinculados exibem o nome atualizado.
+- **Exclusão:** excluir uma tecnologia vinculada. Esperado: a referência histórica do projeto continua legível, sem perder seus dados; o usuário pode desmarcar a referência histórica quando editar o projeto.
+- **Compatibilidade:** abrir projetos criados antes da v5.14, conferir que categorias, descrições, links e marcadores antigos foram preservados. Os nomes dos marcadores que coincidem com tecnologias não devem ser exibidos duplicados.
+- **Segurança:** tentar enviar ID de tecnologia inexistente ou 31 IDs: a API deve rejeitar com HTTP 400; IDs duplicados devem virar uma única associação. Testar salvamento sem sessão: HTTP 401.
+- **Acessibilidade e visual:** verificar pesquisa por teclado, foco, contraste e largura dos chips em 390 px, no Light e Dark Mode.
+- **Automação local:** `npm run check` e `npm test`, incluindo `tests/project-technologies-v514.test.mjs`.
+- **Pendente de validação externa:** executar fluxo completo com login e Netlify Blobs na implantação do usuário, pois os testes locais com armazenamento simulado não comprovam o deploy.

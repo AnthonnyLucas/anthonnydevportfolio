@@ -40,7 +40,25 @@ export function setupProjects(){
       const labels=(Array.isArray(project.categories)?project.categories:[]).map(id=>categories.find(c=>c.id===id)?.label).filter(Boolean);
       const categoriesLine=el('div','project-category-badges');(labels.length?labels:[project.category||'Projeto']).forEach(label=>categoriesLine.append(el('span','project-category',label)));
       body.append(categoriesLine,el('h3','',project.title),el('p','',project.description));
-      const tags=el('div','project-tags');(Array.isArray(project.tags)?project.tags:[]).forEach(tag=>tags.append(el('span','',tag)));body.append(tags);
+      // Ferramentas pertencem ao projeto, não à vitrine global de competências.
+      const technologies=Array.isArray(project.technologies)?project.technologies:[];
+      if(technologies.length){
+        const section=el('section','project-tech-section');
+        section.append(el('h4','project-tech-heading','Tecnologias e ferramentas'));
+        const pills=el('div','project-tech-list');
+        for(const tech of technologies){
+          const pill=el('span','project-tech-pill');
+          const logo=typeof tech.logoUrl==='string' && (/^\/assets\/tech-(logos|icon-library)\/[a-z0-9-]+\.svg$/.test(tech.logoUrl)||/^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(tech.logoUrl)||/^https:\/\/[^/]+/i.test(tech.logoUrl)) ? tech.logoUrl : '';
+          if(logo){const img=el('img','project-tech-logo');img.src=logo;img.loading='lazy';img.alt='';img.setAttribute('aria-hidden','true');img.onerror=()=>img.remove();pill.append(img);}
+          else pill.append(el('span','project-tech-dot','●'));
+          pill.append(el('span','',tech.label));pills.append(pill);
+        }
+        section.append(pills);body.append(section);
+      }
+      // Marcadores antigos não são apagados nem confundidos com tecnologias.
+      const techNames=new Set(technologies.map(t=>String(t.label).toLocaleLowerCase('pt-BR')));
+      const legacyTags=(Array.isArray(project.topics)?project.topics:(Array.isArray(project.tags)?project.tags:[])).filter(t=>!techNames.has(String(t).toLocaleLowerCase('pt-BR')));
+      if(legacyTags.length){const tags=el('div','project-tags');legacyTags.forEach(tag=>tags.append(el('span','',tag)));body.append(tags);}
       const links=el('div','project-links');for(const [key,label] of [['repository','Código ↗'],['demo','Visualizar ↗']]){
         const href=safeUrl(project[key]);if(!href)continue;const a=el('a','',label);a.href=href;a.target='_blank';a.rel='noopener noreferrer';links.append(a);
       }

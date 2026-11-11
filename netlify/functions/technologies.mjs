@@ -12,7 +12,7 @@ const originalColors = {
   MQTT:'#A38AFF',LoRa:'#7CD9D1',LoRaWAN:'#7CD9D1',MySQL:'#76C3DE',
   'SQL Server':'#EC7A86','Power BI':'#ECD465'
 };
-const seed = skills.map((s,i) => ({id:`seed-tech-${i+1}`,label:s.label,cat:s.cat,icon:s.icon,color:originalColors[s.label]||'#B7FF79',logoUrl:''}));
+export const seed = skills.map((s,i) => ({id:`seed-tech-${i+1}`,label:s.label,cat:s.cat,icon:s.icon,color:originalColors[s.label]||'#B7FF79',logoUrl:''}));
 const cut = (v,max) => String(v??'').trim().slice(0,max);
 function validateLogo(value) {
   const url=cut(value,800);

@@ -5,6 +5,7 @@ initParticles({ admin: true });
 import { setupCmsAdmin } from './cms-admin.js';
 import { setupCategoryAdmin } from './category-admin.js';
 import { createAdminFeedback } from './admin-feedback.js';
+import { createProjectTechPicker } from './project-tech-picker.js';
 const qs = selector => document.querySelector(selector);
 const state = { projects: [], certificates: [], projectShowAll:false, certShowAll:false, imageUrl: '', pendingPreview: null, certImageUrl: '', certPendingPreview: null };
 const status = qs('#admin-status');
@@ -27,6 +28,11 @@ const request = async (url, options = {}) => {
   return data;
 };
 const cmsAdmin = setupCmsAdmin({request,showStatus});
+const projectTechPicker=createProjectTechPicker({root:qs('#project-tech-picker'),search:qs('#project-tech-search'),status:qs('#project-tech-count')});
+async function refreshProjectTechnologies(){
+  try{const result=await request('/.netlify/functions/technologies');projectTechPicker.setCatalog(result.technologies||[]);}
+  catch(error){qs('#project-tech-count').textContent='Não foi possível sincronizar tecnologias: '+error.message;}
+}
 const categoryManager = setupCategoryAdmin({request,showStatus,onUpdate:()=>{renderList();renderCertList();}});
 const categoriesFor = item => Array.isArray(item.categories) && item.categories.length?item.categories:categoryManager.projects.filter(cat=>cat.label===item.category).map(cat=>cat.id);
 const preview = url => {
@@ -48,6 +54,7 @@ function releasePreview() {
 function clearForm() {
   qs('#project-form').reset();
   categoryManager.selectProject([]);
+  projectTechPicker.setSelected([]);
   qs('#project-id').value = '';
   qs('#editor-title').textContent = 'Novo projeto';
   state.imageUrl = '';
@@ -60,7 +67,7 @@ function editProject(project) {
   qs('#project-title').value = project.title || '';
   categoryManager.selectProject(categoriesFor(project));
   qs('#project-desc').value = project.description || '';
-  qs('#project-tags').value = (project.tags || []).join(', ');
+  projectTechPicker.setSelected(project.technologyIds||[],project.technologies||[]);
   qs('#project-repo').value = project.repository || '';
   qs('#project-demo').value = project.demo || '';
   qs('#project-image-url').value = project.image || '';
@@ -106,6 +113,7 @@ qs('#project-show-all').addEventListener('click',()=>{state.projectShowAll=!stat
 async function refresh() {
   await categoryManager.refresh();
   const [projectsResult, certResult] = await Promise.all([request('/.netlify/functions/projects'), request('/.netlify/functions/certificates')]);
+  await refreshProjectTechnologies();
   state.projects = projectsResult.projects || [];
   state.certificates = certResult.certificates || [];
   renderList();
@@ -173,7 +181,7 @@ qs('#project-form').addEventListener('submit',async event=>{
     const selectedCategories=categoryManager.selectedProjectIds();
     if(!selectedCategories.length)throw new Error('Selecione ao menos uma categoria para o projeto.');
     const body={ id:qs('#project-id').value||undefined, title:qs('#project-title').value, categories:selectedCategories,
-      description:qs('#project-desc').value, tags:qs('#project-tags').value.split(',').map(s=>s.trim()).filter(Boolean),
+      description:qs('#project-desc').value, technologyIds:projectTechPicker.selectedIds(),
       image, repository:qs('#project-repo').value, demo:qs('#project-demo').value, featured:qs('#project-featured').checked };
     const data=await request('/.netlify/functions/projects',{ method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body) });
     state.projects=data.projects||[];renderList();clearForm();
@@ -272,6 +280,7 @@ function selectTab(name) {
     tab.setAttribute('aria-selected',String(key===name));
   }
   if(name==='certificates')requestAnimationFrame(alignCertColumns);
+  if(name==='projects')refreshProjectTechnologies();
 }
 for(const name of ['content','technologies','projects','certificates']) {
   qs(`#tab-${name}`).addEventListener('click',()=>selectTab(name));

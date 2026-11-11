@@ -1,6 +1,6 @@
 # Portfólio Anthonny Lucas — Full Stack, IoT e Inteligência Artificial
 
-**Versão:** 5.13.0  
+**Versão:** 5.14.0  
 **Autor:** Anthonny Lucas Santos da Silva  
 **Tipo:** aplicação web de portfólio com painel administrativo (CMS)  
 **Publicação prevista:** Netlify, com funções de servidor e Netlify Blobs  
@@ -27,7 +27,7 @@ O projeto também funciona como uma **base reutilizável de portfólio pessoal**
 | **Início** | Apresentação, especialidades, links e janela de código animada | Edita textos, títulos e chamadas |
 | **Sobre mim** | Biografia, fotografia e pilares profissionais | Edita textos, imagem e enquadramento |
 | **Tecnologias** | Carrossel 3D, filtros por área, arraste, setas e teclado | Cadastra, altera, exclui, reordena, filtra e categoriza tecnologias; seleciona logotipos |
-| **Projetos** | Catálogo horizontal com dois cartões no desktop, filtros por categoria e links opcionais | Cadastra, edita e exclui projetos; utiliza múltiplas categorias; adiciona imagens e links |
+| **Projetos** | Catálogo horizontal com dois cartões no desktop, filtros por categoria, tecnologias e ferramentas destacadas em cada projeto e links opcionais | Cadastra, edita e exclui projetos; utiliza múltiplas categorias e escolhe várias tecnologias já cadastradas; adiciona imagens e links |
 | **Formações** | Vitrine de certificados com filtros, navegação e visualização de imagens | Edita cursos, instituições, horas, categorias, imagens e descrições |
 | **Contato** | Atalhos E-mail, WhatsApp, GitHub e LinkedIn; formulário | Ajusta os links em Páginas & textos → Redes sociais; edita textos |
 | **Aparência** | Light Mode / Dark Mode, barras de rolagem e partículas animadas | Usa os dois temas também no dashboard |
@@ -54,7 +54,8 @@ public/
     style.css, v5*.css       Layout, temas e acabamento visual
     main.js                  Inicialização do site público
     admin.js                 Inicialização do dashboard
-    cms-admin.js             Editor de tecnologias, projetos e formações
+    cms-admin.js             Editor de conteúdos e tecnologias
+    project-tech-picker.js   Seletor múltiplo de tecnologias para projetos
     content-client.js        Aplicação de textos/links configuráveis
     site-schema.js           Contrato dos campos editáveis
     *-carousel.js            Navegação das vitrines
@@ -205,3 +206,14 @@ A Netlify Function `icon-library.mjs` oferece uma recuperação pelo próprio do
 A janela de **Ampliar imagem** em **Formações** permanece fixa na área visível e não desloca o site para o Início. Fechar a imagem, pressionar Esc ou alterar o filtro preserva o ponto atual de leitura. A mudança não afeta a navegação proposital da sidebar nem o fluxo de confirmação ao salvar no painel administrativo.
 
 O CSS dos certificados recebeu uma nova versão de URL para atualizar o cache após o deploy. Consulte [`ALTERACOES_V5_13_ROLAGEM_PUBLICA.md`](ALTERACOES_V5_13_ROLAGEM_PUBLICA.md) para a explicação e a lista de verificações.
+
+
+## Atualização v5.14 — Tecnologias vinculadas a cada projeto
+
+No painel **Projetos**, o antigo campo de tecnologias digitadas com vírgulas foi substituído por um seletor pesquisável de múltipla escolha. A lista é carregada da seção **Tecnologias** já cadastradas do seu perfil — e **não** da biblioteca de milhares de logotipos. Para usar Angular, IoT, IA ou outra ferramenta em um projeto, primeiro cadastre a tecnologia na seção Tecnologias (caso ainda não exista) e selecione-a ao criar ou editar o projeto.
+
+O site público agora exibe a seção **Tecnologias e ferramentas** dentro do cartão específico do projeto, com etiquetas realçadas e logotipos cadastrados quando disponíveis. As **categorias** continuam independentes (ex.: Energia Solar, Automação Residencial, Internet das Coisas) e não são automaticamente consideradas ferramentas. O mesmo registro de tecnologia pode ser associado a vários projetos.
+
+A associação é feita com IDs persistentes, então renomear a tecnologia reflete nos projetos vinculados. Uma exclusão futura não elimina o resumo histórico salvo no projeto. Registros antigos com nomes de tecnologias em `tags` são reconhecidos quando o nome corresponder a uma tecnologia existente, e os outros marcadores permanecem preservados como tópicos. A seleção nova não depende de digitação livre.
+
+**API:** `POST /.netlify/functions/projects` aceita `technologyIds` (até 30 IDs únicos); `GET` retorna `technologyIds`, `technologies` (registros públicos resolvidos) e `topics` (marcadores antigos sem nomes de tecnologias). Novos IDs são validados no catálogo persistido pelo servidor. Consulte `ALTERACOES_V5_14_TECNOLOGIAS_POR_PROJETO.md`.
