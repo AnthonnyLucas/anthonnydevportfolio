@@ -1,4 +1,3 @@
-import { setCvLinks } from './cv-download.js';
 import { contentDefaults, contentFields } from './site-schema.js';
 const validKeys = new Set(contentFields.map(item=>item.key));
 // Normaliza links permitidos; nunca aceita javascript:, redirecionamentos arbitrários ou URLs com credenciais.
@@ -80,7 +79,6 @@ export function applyContent(content = contentDefaults, root = document) {
   bindContactLink(root.querySelector('#public-contact-email'),gmailHref,'E-mail: abrir composição de mensagem');
   bindContactLink(root.querySelector('#sidebar-whatsapp'),whatsappHref,'Conversar pelo WhatsApp');
   bindContactLink(root.querySelector('#public-contact-whatsapp'),whatsappHref,'WhatsApp: iniciar conversa');
-  setCvLinks(values,root);
   const portrait = values.aboutImage;
   if (portrait && (/^https:\/\//i.test(portrait) || /^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(portrait))) {
     root.querySelectorAll('[data-portrait]').forEach(img => {

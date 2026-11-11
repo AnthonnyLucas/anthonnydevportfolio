@@ -38,8 +38,6 @@ export const contentFields = [
   field('aboutBody','sobre','Trajetória profissional','Minha trajetória combina desenvolvimento de software, automação, coleta e análise de dados, inteligência artificial e pesquisa tecnológica. Também participei de atividades ligadas a empreendedorismo, inovação e prototipação.','textarea',2200),
   field('aboutImage','sobre','Fotografia','https://avatars.githubusercontent.com/u/119464268?v=4','image',800),
   field('aboutImagePosition','sobre','Enquadramento vertical (%)','50','range',3),
-  field('aboutCvTraditional','sobre','Currículo tradicional — PDF ou link','/assets/cv/curriculo-tradicional.pdf','pdf',800),
-  field('aboutCvAts','sobre','Currículo ATS — PDF ou link','/assets/cv/curriculo-ats.pdf','pdf',800),
   field('aboutCaption','sobre','Legenda da fotografia','FULL STACK / IoT / IA'),
   field('pillar1Title','sobre','Pilar 1 – título','Engenharia'),
   field('pillar1Description','sobre','Pilar 1 – descrição','Estruturar soluções confiáveis, claras e escaláveis.','textarea',480),

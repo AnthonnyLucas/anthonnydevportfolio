@@ -11,6 +11,8 @@
 .project-tech-list{display:flex;flex-wrap:wrap;gap:7px}
 .project-tech-pill{display:inline-flex;align-items:center;gap:7px;padding:7px 10px;max-width:100%;border:1px solid color-mix(in srgb,var(--green) 34%,var(--line));background:color-mix(in srgb,var(--green) 8%,var(--panel));border-radius:999px;color:var(--text);font:650 11px var(--font)}
 .project-tech-pill>span:last-child{overflow-wrap:anywhere}
+.project-tech-logo{width:17px;height:17px;object-fit:contain;flex:none}
+.project-tech-dot{color:var(--green);font-size:10px}
 .project-card .project-tags{margin-top:7px}
 @media(max-width:540px){.project-tech-picker{grid-template-columns:1fr}.project-tech-pill{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.project-tech-check{transition:none}}
