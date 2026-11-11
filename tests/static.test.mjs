@@ -26,7 +26,7 @@ test('public project showcase, admin category controls, searchable catalogs and 
 test('all relative imports resolve to included files',()=>{
  for(const file of ['public/assets/main.js','public/assets/admin.js','public/assets/cms-admin.js','public/assets/project-carousel.js','public/assets/tech-icon-catalog.js','public/assets/category-admin.js','public/assets/cert-carousel.js','netlify/functions/projects.mjs','netlify/functions/categories.mjs','netlify/functions/certificates.mjs']){
   const text=read(file);
-  for(const m of text.matchAll(/from\s+['"](\.[^'"]+)['"]/g))assert.ok(existsSync(resolve(dirname(file),m[1])),`${file} -> ${m[1]}`);
+  for(const m of text.matchAll(/from\s+['"](\.[^'"]+)['"]/g))assert.ok(existsSync(resolve(dirname(file),m[1].split('?')[0])),`${file} -> ${m[1]}`);
  }
 });
 

@@ -1,6 +1,6 @@
 # Portfólio Anthonny Lucas — Full Stack, IoT e Inteligência Artificial
 
-**Versão:** 5.14.0  
+**Versão:** 5.15.0  
 **Autor:** Anthonny Lucas Santos da Silva  
 **Tipo:** aplicação web de portfólio com painel administrativo (CMS)  
 **Publicação prevista:** Netlify, com funções de servidor e Netlify Blobs  
@@ -217,3 +217,8 @@ O site público agora exibe a seção **Tecnologias e ferramentas** dentro do ca
 A associação é feita com IDs persistentes, então renomear a tecnologia reflete nos projetos vinculados. Uma exclusão futura não elimina o resumo histórico salvo no projeto. Registros antigos com nomes de tecnologias em `tags` são reconhecidos quando o nome corresponder a uma tecnologia existente, e os outros marcadores permanecem preservados como tópicos. A seleção nova não depende de digitação livre.
 
 **API:** `POST /.netlify/functions/projects` aceita `technologyIds` (até 30 IDs únicos); `GET` retorna `technologyIds`, `technologies` (registros públicos resolvidos) e `topics` (marcadores antigos sem nomes de tecnologias). Novos IDs são validados no catálogo persistido pelo servidor. Consulte `ALTERACOES_V5_14_TECNOLOGIAS_POR_PROJETO.md`.
+
+
+## Atualização v5.15 — Exibição das tecnologias dentro dos projetos
+
+A v5.15 corrige o carregamento dos módulos públicos e torna a leitura dos IDs das tecnologias vinculadas mais resiliente, trazendo etiquetas vitrificadas com cores individuais para cada cartão de projeto. Consulte [`ALTERACOES_V5_15_EXIBICAO_TECNOLOGIAS_PROJETOS.md`](./ALTERACOES_V5_15_EXIBICAO_TECNOLOGIAS_PROJETOS.md) para testes e procedimentos de publicação.

@@ -5,7 +5,7 @@ initParticles({ admin: true });
 import { setupCmsAdmin } from './cms-admin.js';
 import { setupCategoryAdmin } from './category-admin.js';
 import { createAdminFeedback } from './admin-feedback.js';
-import { createProjectTechPicker } from './project-tech-picker.js';
+import { createProjectTechPicker } from './project-tech-picker.js?v=5.15.0';
 const qs = selector => document.querySelector(selector);
 const state = { projects: [], certificates: [], projectShowAll:false, certShowAll:false, imageUrl: '', pendingPreview: null, certImageUrl: '', certPendingPreview: null };
 const status = qs('#admin-status');
@@ -95,6 +95,7 @@ function renderList() {
     const title=document.createElement('h3');title.textContent=project.title;
     const meta=document.createElement('p');meta.textContent=categoriesFor(project).map(id=>categoryManager.projects.find(c=>c.id===id)?.label).filter(Boolean).join(' · ') + (project.featured?' · Em destaque':'');
     content.append(title,meta);
+    if(Array.isArray(project.technologies)&&project.technologies.length){const linked=document.createElement('p');linked.className='admin-project-tech-summary';linked.textContent='Ferramentas vinculadas: '+project.technologies.map(t=>t.label).filter(Boolean).join(' · ');content.append(linked);}
     const actions=document.createElement('div');actions.className='list-actions';
     const edit=document.createElement('button');edit.type='button';edit.textContent='Editar';edit.addEventListener('click',()=>editProject(project));
     const remove=document.createElement('button');remove.type='button';remove.className='delete';remove.textContent='Excluir';
@@ -180,12 +181,16 @@ qs('#project-form').addEventListener('submit',async event=>{
     }
     const selectedCategories=categoryManager.selectedProjectIds();
     if(!selectedCategories.length)throw new Error('Selecione ao menos uma categoria para o projeto.');
+    const selectedTechnologyIds=projectTechPicker.selectedIds();
     const body={ id:qs('#project-id').value||undefined, title:qs('#project-title').value, categories:selectedCategories,
-      description:qs('#project-desc').value, technologyIds:projectTechPicker.selectedIds(),
+      description:qs('#project-desc').value, technologyIds:selectedTechnologyIds,
       image, repository:qs('#project-repo').value, demo:qs('#project-demo').value, featured:qs('#project-featured').checked };
     const data=await request('/.netlify/functions/projects',{ method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body) });
     state.projects=data.projects||[];renderList();clearForm();
-    showStatus('Projeto salvo com sucesso! Abra a página pública para visualizar.','success',{persisted:true});
+    const savedProject=state.projects.find(p=>p.id===(body.id||state.projects[0]?.id));
+    if(selectedTechnologyIds.length && (!savedProject || savedProject.technologies?.length !== selectedTechnologyIds.length)){
+      showStatus('Projeto salvo, mas o servidor não confirmou todos os vínculos de tecnologias. Reabra o projeto e verifique as seleções antes de publicar.','error',{persisted:true});
+    }else showStatus('Projeto salvo com sucesso! As tecnologias vinculadas aparecem no cartão público após a atualização.','success',{persisted:true});
   }catch(err){showStatus(err.message||'Falha ao salvar.','error',{failed:true});}
   finally{save.disabled=false;}
 });
@@ -245,6 +250,7 @@ function renderCertList() {
     const content=document.createElement('div');const title=document.createElement('h3');title.textContent=course.name;
     const meta=document.createElement('p');meta.textContent=`${categoryManager.certificates.find(c=>c.id===course.groupId)?.label || course.group} · ${course.hours}`;
     content.append(title,meta);
+    if(Array.isArray(project.technologies)&&project.technologies.length){const linked=document.createElement('p');linked.className='admin-project-tech-summary';linked.textContent='Ferramentas vinculadas: '+project.technologies.map(t=>t.label).filter(Boolean).join(' · ');content.append(linked);}
     const actions=document.createElement('div');actions.className='list-actions';
     const edit=document.createElement('button');edit.type='button';edit.textContent='Editar';edit.addEventListener('click',()=>editCertificate(course));
     const remove=document.createElement('button');remove.type='button';remove.className='delete';remove.textContent='Excluir';

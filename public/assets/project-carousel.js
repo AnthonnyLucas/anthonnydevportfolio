@@ -1,4 +1,5 @@
 import {showcaseProjects} from './data.js';
+import {resolveProjectTechnologies} from './project-technology-view.js?v=5.15.0';
 const $=s=>document.querySelector(s);
 const el=(tag,cls='',value='')=>{const n=document.createElement(tag);if(cls)n.className=cls;if(value)n.textContent=value;return n;};
 const safeUrl=(s,image=false)=>{
@@ -10,7 +11,7 @@ export function setupProjects(){
   const viewport=$('#project-viewport'),track=$('#project-grid'),bar=$('#project-filters');
   const prev=$('#project-prev'),next=$('#project-next'),live=$('#project-live'),counter=$('#project-counter');
   if(!viewport||!track||!bar)return;
-  let list=[...showcaseProjects],categories=[],filter='all',selection=[],index=0,drag=null,settling=false;
+  let list=[...showcaseProjects],categories=[],technologyCatalog=[],filter='all',selection=[],index=0,drag=null,settling=false;
   const visibleCount=()=>matchMedia('(max-width:740px)').matches?1:2;
   const maxIndex=()=>Math.max(0,selection.length-visibleCount());
   const offset=i=>track.children[i] ? track.children[i].offsetLeft-track.children[0].offsetLeft:0;
@@ -39,22 +40,25 @@ export function setupProjects(){
       const body=el('div','project-body');
       const labels=(Array.isArray(project.categories)?project.categories:[]).map(id=>categories.find(c=>c.id===id)?.label).filter(Boolean);
       const categoriesLine=el('div','project-category-badges');(labels.length?labels:[project.category||'Projeto']).forEach(label=>categoriesLine.append(el('span','project-category',label)));
-      body.append(categoriesLine,el('h3','',project.title),el('p','',project.description));
-      // Ferramentas pertencem ao projeto, não à vitrine global de competências.
-      const technologies=Array.isArray(project.technologies)?project.technologies:[];
+      body.append(el('h3','project-title',project.title),categoriesLine);
+      // Somente ferramentas vinculadas ao projeto; IDs antigos são resolvidos pelo catálogo atual.
+      const technologies=resolveProjectTechnologies(project,technologyCatalog);
       if(technologies.length){
         const section=el('section','project-tech-section');
-        section.append(el('h4','project-tech-heading','Tecnologias e ferramentas'));
+        section.append(el('h4','project-tech-heading','Tecnologias e ferramentas utilizadas'));
         const pills=el('div','project-tech-list');
         for(const tech of technologies){
-          const pill=el('span','project-tech-pill');
+          const pill=el('span','project-tech-pill');pill.style.setProperty('--tech-accent',tech.color);
           const logo=typeof tech.logoUrl==='string' && (/^\/assets\/tech-(logos|icon-library)\/[a-z0-9-]+\.svg$/.test(tech.logoUrl)||/^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(tech.logoUrl)||/^https:\/\/[^/]+/i.test(tech.logoUrl)) ? tech.logoUrl : '';
-          if(logo){const img=el('img','project-tech-logo');img.src=logo;img.loading='lazy';img.alt='';img.setAttribute('aria-hidden','true');img.onerror=()=>img.remove();pill.append(img);}
-          else pill.append(el('span','project-tech-dot','●'));
-          pill.append(el('span','',tech.label));pills.append(pill);
+          const badge=el('span','project-tech-icon');
+          const glyph=()=>{badge.replaceChildren(el('span','project-tech-glyph',tech.icon || tech.label.slice(0,2).toUpperCase()));};
+          if(logo){const img=el('img','project-tech-logo');img.src=logo;img.loading='lazy';img.alt='';img.setAttribute('aria-hidden','true');img.onerror=glyph;badge.append(img);}
+          else glyph();
+          pill.append(badge,el('span','project-tech-name',tech.label));pills.append(pill);
         }
         section.append(pills);body.append(section);
       }
+      body.append(el('p','project-description',project.description));
       // Marcadores antigos não são apagados nem confundidos com tecnologias.
       const techNames=new Set(technologies.map(t=>String(t.label).toLocaleLowerCase('pt-BR')));
       const legacyTags=(Array.isArray(project.topics)?project.topics:(Array.isArray(project.tags)?project.tags:[])).filter(t=>!techNames.has(String(t).toLocaleLowerCase('pt-BR')));
@@ -88,11 +92,13 @@ export function setupProjects(){
   let scheduled=false;viewport.addEventListener('scroll',()=>{if(scheduled||drag||settling)return;scheduled=true;requestAnimationFrame(()=>{scheduled=false;let closest=0;for(let i=0;i<=maxIndex();i++)if(Math.abs(offset(i)-viewport.scrollLeft)<Math.abs(offset(closest)-viewport.scrollLeft))closest=i;if(closest!==index){index=closest;update();}});},{passive:true});
   window.addEventListener('resize',()=>move(Math.min(index,maxIndex()),'instant'));
   async function load(){
-    const [p,c]=await Promise.allSettled([
+    const [p,c,t]=await Promise.allSettled([
       fetch('/.netlify/functions/projects',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject()),
-      fetch('/.netlify/functions/categories?kind=projects',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject())
+      fetch('/.netlify/functions/categories?kind=projects',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject()),
+      fetch('/.netlify/functions/technologies',{cache:'no-store'}).then(r=>r.ok?r.json():Promise.reject())
     ]);
     if(p.status==='fulfilled' && Array.isArray(p.value.projects))list=p.value.projects;
+    if(t.status==='fulfilled' && Array.isArray(t.value.technologies))technologyCatalog=t.value.technologies;
     if(c.status==='fulfilled' && Array.isArray(c.value.categories))categories=c.value.categories;
     else categories=[{id:'full-stack',label:'Full Stack'},{id:'iot',label:'IoT'},{id:'inteligencia-artificial',label:'Inteligência Artificial'},{id:'dados',label:'Dados'},{id:'outros',label:'Outros'}];
     renderFilters();applyFilter();

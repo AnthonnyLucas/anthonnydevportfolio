@@ -1,4 +1,4 @@
-import { setupProjects } from './project-carousel.js';
+import { setupProjects } from './project-carousel.js?v=5.15.0';
 import { setupCertificates } from './cert-carousel.js';
 import { setupTechCarousel } from './tech-carousel.js';
 import { loadSiteContent } from './content-client.js';
