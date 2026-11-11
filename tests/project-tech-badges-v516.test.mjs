@@ -21,8 +21,8 @@ test('v5.16: etiquetas usam dimensões compactas semelhantes à categoria IoT', 
   const categories = content('public/assets/v5.css');
   assert.match(categories,/project-category\{[^}]*padding:5px 10px/);
 });
-test('v5.16: os arquivos públicos usam identificador novo para evitar cache antigo', () => {
-  assert.match(content('public/assets/main.js'),/project-carousel\.js\?v=5\.16\.0/);
-  assert.match(content('public/index.html'),/main\.js\?v=5\.16\.0/);
-  assert.match(content('public/index.html'),/v5-15\.css\?v=5\.16\.0/);
+test('v5.17: os arquivos públicos usam identificador novo para evitar cache antigo', () => {
+  assert.match(content('public/assets/main.js'),/project-carousel\.js\?v=5\.17\.0/);
+  assert.match(content('public/index.html'),/main\.js\?v=5\.17\.0/);
+  assert.match(content('public/index.html'),/v5-17\.css\?v=5\.17\.0/);
 });

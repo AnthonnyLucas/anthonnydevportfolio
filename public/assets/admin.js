@@ -2,7 +2,7 @@ import { initTheme } from './theme-controls.js';
 import { initParticles } from './particles.js';
 initTheme();
 initParticles({ admin: true });
-import { setupCmsAdmin } from './cms-admin.js';
+import { setupCmsAdmin } from './cms-admin.js?v=5.17.0';
 import { setupCategoryAdmin } from './category-admin.js';
 import { createAdminFeedback } from './admin-feedback.js';
 import { createProjectTechPicker } from './project-tech-picker.js?v=5.15.0';

@@ -7,6 +7,13 @@ const safeUrl=(s,image=false)=>{
   if(image && (/^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(s) || /^\/assets\/project-(solar|aqua|certificates|curves)\.svg$/.test(s)))return s;
   try{const u=new URL(s);return ['https:','http:'].includes(u.protocol)?u.href:'';}catch{return '';}
 };
+// O último conjunto de cartões retorna ao primeiro, e vice-versa.
+export function wrapProjectIndex(requested, maximum){
+  if(maximum<=0)return 0;
+  if(requested>maximum)return 0;
+  if(requested<0)return maximum;
+  return requested;
+}
 export function setupProjects(){
   const viewport=$('#project-viewport'),track=$('#project-grid'),bar=$('#project-filters');
   const prev=$('#project-prev'),next=$('#project-next'),live=$('#project-live'),counter=$('#project-counter');
@@ -24,7 +31,7 @@ export function setupProjects(){
   }
   function move(to,behavior='smooth'){
     if(!selection.length){update();return;}
-    index=Math.max(0,Math.min(maxIndex(),to));
+    index=wrapProjectIndex(to,maxIndex());
     settling=true;viewport.scrollTo({left:offset(index),behavior});update();
     setTimeout(()=>{settling=false;},behavior==='smooth'?430:0);
   }
