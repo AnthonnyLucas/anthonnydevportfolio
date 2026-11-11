@@ -7,6 +7,13 @@ const safeUrl=(s,image=false)=>{
   if(image && (/^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(s) || /^\/assets\/project-(solar|aqua|certificates|curves)\.svg$/.test(s)))return s;
   try{const u=new URL(s);return ['https:','http:'].includes(u.protocol)?u.href:'';}catch{return '';}
 };
+// O último conjunto de cartões retorna ao primeiro, e vice-versa.
+export function wrapProjectIndex(requested, maximum){
+  if(maximum<=0)return 0;
+  if(requested>maximum)return 0;
+  if(requested<0)return maximum;
+  return requested;
+}
 export function setupProjects(){
   const viewport=$('#project-viewport'),track=$('#project-grid'),bar=$('#project-filters');
   const prev=$('#project-prev'),next=$('#project-next'),live=$('#project-live'),counter=$('#project-counter');
@@ -24,7 +31,7 @@ export function setupProjects(){
   }
   function move(to,behavior='smooth'){
     if(!selection.length){update();return;}
-    index=Math.max(0,Math.min(maxIndex(),to));
+    index=wrapProjectIndex(to,maxIndex());
     settling=true;viewport.scrollTo({left:offset(index),behavior});update();
     setTimeout(()=>{settling=false;},behavior==='smooth'?430:0);
   }
@@ -49,12 +56,8 @@ export function setupProjects(){
         const pills=el('div','project-tech-list');
         for(const tech of technologies){
           const pill=el('span','project-tech-pill');pill.style.setProperty('--tech-accent',tech.color);
-          const logo=typeof tech.logoUrl==='string' && (/^\/assets\/tech-(logos|icon-library)\/[a-z0-9-]+\.svg$/.test(tech.logoUrl)||/^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(tech.logoUrl)||/^https:\/\/[^/]+/i.test(tech.logoUrl)) ? tech.logoUrl : '';
-          const badge=el('span','project-tech-icon');
-          const glyph=()=>{badge.replaceChildren(el('span','project-tech-glyph',tech.icon || tech.label.slice(0,2).toUpperCase()));};
-          if(logo){const img=el('img','project-tech-logo');img.src=logo;img.loading='lazy';img.alt='';img.setAttribute('aria-hidden','true');img.onerror=glyph;badge.append(img);}
-          else glyph();
-          pill.append(badge,el('span','project-tech-name',tech.label));pills.append(pill);
+          // No cartão público mostramos apenas o nome: sem ícone, sigla duplicada ou imagem.
+          pill.append(el('span','project-tech-name',tech.label));pills.append(pill);
         }
         section.append(pills);body.append(section);
       }

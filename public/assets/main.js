@@ -1,7 +1,8 @@
-import { setupProjects } from './project-carousel.js?v=5.15.0';
+import { setupProjects } from './project-carousel.js?v=5.17.0';
+import { setupCvDropdown } from './cv-download.js?v=5.17.0';
 import { setupCertificates } from './cert-carousel.js';
 import { setupTechCarousel } from './tech-carousel.js';
-import { loadSiteContent } from './content-client.js';
+import { loadSiteContent } from './content-client.js?v=5.17.0';
 import { initTheme } from './theme-controls.js';
 import { initParticles } from './particles.js';
 
@@ -17,6 +18,7 @@ const el = (tag, cls = '', text = '') => {
 // O mesmo gerenciador de temas atende ao site público e ao painel administrativo.
 initTheme();
 initParticles();
+setupCvDropdown();
 qs('#year').textContent = new Date().getFullYear();
 
 // Scroll e navegação ativa sem eventos pesados.

@@ -4,6 +4,7 @@ const $=selector=>document.querySelector(selector);
 const create=(tag,cls='',text='')=>{const n=document.createElement(tag);if(cls)n.className=cls;if(text)n.textContent=text;return n;};
 const MAX_IMAGE=4*1024*1024;
 const TYPES=['image/jpeg','image/png','image/webp','image/gif'];
+const PDF_MIME='application/pdf',MAX_PDF=8*1024*1024;
 const safePreview=url => typeof url==='string' && (/^https:\/\//i.test(url) || /^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.(jpg|png|webp|gif)$/.test(url));
 export function setupCmsAdmin({request,showStatus}) {
   const state={content:{...contentDefaults},revision:0,group:'inicio',technologies:[],techShowAll:false,imageObjectUrl:'',techImageObjectUrl:'',techLogo:''};
@@ -77,6 +78,14 @@ export function setupCmsAdmin({request,showStatus}) {
       if(spec.key==='gmailUrl'||spec.key==='whatsappUrl'){
         box.append(create('small','form-hint',spec.key==='gmailUrl'?'Use um endereço de e-mail, um link mailto: ou um link de composição do Gmail.':'Use o link HTTPS do WhatsApp com DDI e DDD, por exemplo https://wa.me/5581999999999.'));
       }
+      if(spec.type==='pdf') {
+        box.append(create('small','form-hint','Use um link HTTPS para PDF ou envie um arquivo PDF (máximo 8 MB). O arquivo ficará público para download.'));
+        const file=create('input');file.type='file';file.id=`cms-upload-${spec.key}`;file.accept='.pdf,application/pdf';
+        file.addEventListener('change',()=>{const current=file.files?.[0];if(current&&(current.type!==PDF_MIME||current.size>MAX_PDF||!current.size)){
+          showStatus('Envie um arquivo PDF válido de até 8 MB.','error');file.value='';
+        }else if(current){showStatus('PDF selecionado. Clique em Salvar alterações para publicar.');}});
+        box.append(file);
+      }
       if(spec.type==='image') {
         const note=create('small','form-hint','Ou envie uma nova imagem JPG, PNG, WebP ou GIF (máx. 4 MB).');
         const file=create('input');file.type='file';file.id=`cms-upload-${spec.key}`;file.accept=TYPES.join(',');
@@ -101,6 +110,12 @@ export function setupCmsAdmin({request,showStatus}) {
     if(!safePreview(result.url))throw new Error('A API não retornou uma imagem válida.');
     return result.url;
   }
+  async function uploadPdf(file){
+    if(file.type!==PDF_MIME || file.size>MAX_PDF || !file.size)throw new Error('Envie um PDF de até 8 MB.');
+    const result=await request('/.netlify/functions/media',{method:'POST',headers:{'Content-Type':PDF_MIME},body:file});
+    if(!/^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.pdf$/.test(result.url))throw new Error('A API não retornou um arquivo PDF válido.');
+    return result.url;
+  }
   contentForm.addEventListener('submit',async e=>{
     e.preventDefault();const button=$('#save-content');button.disabled=true;
     try {
@@ -108,6 +123,10 @@ export function setupCmsAdmin({request,showStatus}) {
       for (const imageKey of ['aboutImage','sidebarBrandImage']) {
         const file=$(`#cms-upload-${imageKey}`)?.files?.[0];
         if(file){showStatus('Enviando imagem...');patch[imageKey]=await upload(file);}
+      }
+      for(const pdfKey of ['aboutCvTraditional','aboutCvAts']){
+        const file=$(`#cms-upload-${pdfKey}`)?.files?.[0];
+        if(file){showStatus('Enviando currículo PDF...');patch[pdfKey]=await uploadPdf(file);}
       }
       if(!Object.keys(patch).length){showStatus('Nenhuma alteração para salvar.');return;}
       showStatus('Salvando os textos e as imagens no servidor...');
@@ -364,7 +383,7 @@ export function setupCmsAdmin({request,showStatus}) {
       renderTechCategoryControls();renderTechCategoryManager();renderTechList();iconCatalog.render();
       alignTechColumns();
       const errors=results.map((r,i)=>r.status==='rejected'?['Conteúdo','Tecnologias','Categorias de tecnologias'][i]+': '+r.reason.message:null).filter(Boolean);
-      if(errors.length)showStatus('Falha no carregamento: '+errors.join(' | '),'error');
+      return errors;
     }
   };
 }

@@ -25,6 +25,13 @@ export function sanitizeContent(patch) {
         catch {throw new Error(`Endereço inválido em ${spec.label}.`);}
       }
     }
+    if (spec.type === 'pdf' && clean) {
+      const local = /^\/assets\/cv\/[a-z0-9_-]+\.pdf$/i.test(clean);
+      const uploaded = /^\/\.netlify\/functions\/media\?key=[a-f0-9-]{36}\.pdf$/i.test(clean);
+      let remote=false;
+      try {const link=new URL(clean);remote=link.protocol==='https:' && Boolean(link.hostname) && !link.username && !link.password;}catch{}
+      if(!local && !uploaded && !remote)throw new Error(`Link de currículo inválido em ${spec.label}.`);
+    }
     if (spec.type === 'gmailLink' && clean) {
       const validEmail = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(clean);
       const validMailto = /^mailto:[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(clean);
