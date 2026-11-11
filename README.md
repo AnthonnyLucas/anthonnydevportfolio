@@ -1,6 +1,6 @@
 # Portfólio Anthonny Lucas — Full Stack, IoT e Inteligência Artificial
 
-**Versão:** 5.15.0  
+**Versão:** 5.16.0  
 **Autor:** Anthonny Lucas Santos da Silva  
 **Tipo:** aplicação web de portfólio com painel administrativo (CMS)  
 **Publicação prevista:** Netlify, com funções de servidor e Netlify Blobs  
@@ -222,3 +222,7 @@ A associação é feita com IDs persistentes, então renomear a tecnologia refle
 ## Atualização v5.15 — Exibição das tecnologias dentro dos projetos
 
 A v5.15 corrige o carregamento dos módulos públicos e torna a leitura dos IDs das tecnologias vinculadas mais resiliente, trazendo etiquetas vitrificadas com cores individuais para cada cartão de projeto. Consulte [`ALTERACOES_V5_15_EXIBICAO_TECNOLOGIAS_PROJETOS.md`](./ALTERACOES_V5_15_EXIBICAO_TECNOLOGIAS_PROJETOS.md) para testes e procedimentos de publicação.
+
+## Atualização v5.16 — Etiquetas compactas das tecnologias nos projetos
+
+As tecnologias vinculadas a cada projeto agora são exibidas somente pelo **nome**, sem círculo, ícone ou sigla repetida. As etiquetas mantêm aparência vitrificada e usam a mesma escala compacta dos marcadores de categoria, como IoT. O cadastro e a seleção múltipla no painel continuam inalterados. Consulte [`ALTERACOES_V5_16_ETIQUETAS_PROJETOS.md`](./ALTERACOES_V5_16_ETIQUETAS_PROJETOS.md).
