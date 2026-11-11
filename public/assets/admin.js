@@ -2,7 +2,7 @@ import { initTheme } from './theme-controls.js';
 import { initParticles } from './particles.js';
 initTheme();
 initParticles({ admin: true });
-import { setupCmsAdmin } from './cms-admin.js?v=5.17.0';
+import { setupCmsAdmin } from './cms-admin.js?v=5.18.0';
 import { setupCategoryAdmin } from './category-admin.js';
 import { createAdminFeedback } from './admin-feedback.js';
 import { createProjectTechPicker } from './project-tech-picker.js?v=5.15.0';
@@ -30,8 +30,8 @@ const request = async (url, options = {}) => {
 const cmsAdmin = setupCmsAdmin({request,showStatus});
 const projectTechPicker=createProjectTechPicker({root:qs('#project-tech-picker'),search:qs('#project-tech-search'),status:qs('#project-tech-count')});
 async function refreshProjectTechnologies(){
-  try{const result=await request('/.netlify/functions/technologies');projectTechPicker.setCatalog(result.technologies||[]);}
-  catch(error){qs('#project-tech-count').textContent='Não foi possível sincronizar tecnologias: '+error.message;}
+  try{const result=await request('/.netlify/functions/technologies');projectTechPicker.setCatalog(result.technologies||[]);return null;}
+  catch(error){qs('#project-tech-count').textContent='Não foi possível sincronizar tecnologias: '+error.message;return error.message;}
 }
 const categoryManager = setupCategoryAdmin({request,showStatus,onUpdate:()=>{renderList();renderCertList();}});
 const categoriesFor = item => Array.isArray(item.categories) && item.categories.length?item.categories:categoryManager.projects.filter(cat=>cat.label===item.category).map(cat=>cat.id);
@@ -83,7 +83,7 @@ function renderList() {
   const list=qs('#admin-project-list');list.replaceChildren();
   const query=qs('#project-search').value.trim().toLocaleLowerCase('pt-BR');
   const category=qs('#project-filter').value;
-  const matched=state.projects.filter(p=>p.title.toLocaleLowerCase('pt-BR').includes(query) && (category==='all'||categoriesFor(p).includes(category)));
+  const matched=state.projects.filter(p=>String(p.title||'').toLocaleLowerCase('pt-BR').includes(query) && (category==='all'||categoriesFor(p).includes(category)));
   const shown=state.projectShowAll?matched:matched.slice(0,5);
   qs('#project-list-summary').textContent=`${shown.length} de ${matched.length} resultados`;
   qs('#project-show-all').hidden=matched.length<=5;
@@ -112,14 +112,29 @@ qs('#project-search').addEventListener('input',()=>{state.projectShowAll=false;r
 qs('#project-filter').addEventListener('change',()=>{state.projectShowAll=false;renderList();});
 qs('#project-show-all').addEventListener('click',()=>{state.projectShowAll=!state.projectShowAll;renderList();});
 async function refresh() {
-  await categoryManager.refresh();
-  const [projectsResult, certResult] = await Promise.all([request('/.netlify/functions/projects'), request('/.netlify/functions/certificates')]);
-  await refreshProjectTechnologies();
-  state.projects = projectsResult.projects || [];
-  state.certificates = certResult.certificates || [];
-  renderList();
-  renderCertList();
-  await cmsAdmin.refresh();
+  // Carregamento independente: a falha de uma área não deve esconder os registros das outras.
+  const issues=[];
+  try { await categoryManager.refresh(); }
+  catch(error) { issues.push('Categorias: '+error.message); }
+  const [projectsResult, certResult, technologiesResult, cmsResult] = await Promise.allSettled([
+    request('/.netlify/functions/projects'),
+    request('/.netlify/functions/certificates'),
+    refreshProjectTechnologies(),
+    cmsAdmin.refresh()
+  ]);
+  if(projectsResult.status==='fulfilled') {
+    state.projects=Array.isArray(projectsResult.value.projects)?projectsResult.value.projects:[];
+    try {renderList();} catch(error){issues.push('Lista de projetos: '+error.message);}
+  } else issues.push('Projetos: '+projectsResult.reason.message);
+  if(certResult.status==='fulfilled') {
+    state.certificates=Array.isArray(certResult.value.certificates)?certResult.value.certificates:[];
+    try {renderCertList();} catch(error){issues.push('Lista de formações: '+error.message);}
+  } else issues.push('Formações: '+certResult.reason.message);
+  if(technologiesResult.status==='rejected')issues.push('Seletor de tecnologias: '+technologiesResult.reason.message);
+  else if(technologiesResult.value)issues.push('Seletor de tecnologias: '+technologiesResult.value);
+  if(cmsResult.status==='rejected')issues.push('Páginas e tecnologias: '+cmsResult.reason.message);
+  else if(Array.isArray(cmsResult.value))issues.push(...cmsResult.value);
+  if(issues.length)throw new Error(issues.join(' | '));
 }
 async function init() {
   try {
@@ -237,7 +252,7 @@ function renderCertList() {
   const list=qs('#admin-cert-list');list.replaceChildren();
   const query=qs('#cert-search').value.trim().toLocaleLowerCase('pt-BR');
   const category=qs('#cert-filter').value;
-  const matched=state.certificates.filter(item=>(item.name.toLocaleLowerCase('pt-BR').includes(query)||item.org.toLocaleLowerCase('pt-BR').includes(query)) && (category==='all'||item.groupId===category||categoryManager.certificates.find(c=>c.id===category)?.label===item.group));
+  const matched=state.certificates.filter(item=>(String(item.name||'').toLocaleLowerCase('pt-BR').includes(query)||String(item.org||'').toLocaleLowerCase('pt-BR').includes(query)) && (category==='all'||item.groupId===category||categoryManager.certificates.find(c=>c.id===category)?.label===item.group));
   const shown=state.certShowAll?matched:matched.slice(0,5);
   qs('#cert-list-summary').textContent=`${shown.length} de ${matched.length} resultados`;
   qs('#cert-show-all').hidden=matched.length<=5;
@@ -250,7 +265,6 @@ function renderCertList() {
     const content=document.createElement('div');const title=document.createElement('h3');title.textContent=course.name;
     const meta=document.createElement('p');meta.textContent=`${categoryManager.certificates.find(c=>c.id===course.groupId)?.label || course.group} · ${course.hours}`;
     content.append(title,meta);
-    if(Array.isArray(project.technologies)&&project.technologies.length){const linked=document.createElement('p');linked.className='admin-project-tech-summary';linked.textContent='Ferramentas vinculadas: '+project.technologies.map(t=>t.label).filter(Boolean).join(' · ');content.append(linked);}
     const actions=document.createElement('div');actions.className='list-actions';
     const edit=document.createElement('button');edit.type='button';edit.textContent='Editar';edit.addEventListener('click',()=>editCertificate(course));
     const remove=document.createElement('button');remove.type='button';remove.className='delete';remove.textContent='Excluir';

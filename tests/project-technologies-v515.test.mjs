@@ -46,7 +46,7 @@ test('v5.15: proteção contra JavaScript em cache e aparência colorida em dark
   const css=contents('public/assets/v5-15.css');
   assert.match(main,/project-carousel\.js\?v=5\.(?:15|16|17)\.0/);
   assert.match(publicHtml,/main\.js\?v=5\.(?:15|16|17)\.0/);
-  assert.match(adminHtml,/admin\.js\?v=5\.(?:15|17)\.0/);
+  assert.match(adminHtml,/admin\.js\?v=5\.(?:15|17|18)\.0/);
   assert.match(publicHtml,/v5-15\.css\?v=5\.(?:15|16|17)\.0/);
   assert.match(card,/resolveProjectTechnologies\(project,technologyCatalog\)/);
   assert.match(card,/\/\.netlify\/functions\/technologies/);

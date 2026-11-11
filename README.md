@@ -1,8 +1,10 @@
+> **Versão 5.18:** correção do carregamento das abas do painel administrativo, incluindo tecnologias e certificados; preserva todas as funcionalidades da 5.17. Consulte `ALTERACOES_V5_18_REPARO_CMS.md` para diagnóstico, testes e validação na Netlify.
+
 > **Versão 5.17:** projetos com navegação circular e botão de download de currículo tradicional/ATS em Sobre mim. Consulte `ALTERACOES_V5_17_CURRICULOS_CARROSSEL.md` para instruções e aviso sobre revisão dos PDFs.
 
 # Portfólio Anthonny Lucas — Full Stack, IoT e Inteligência Artificial
 
-**Versão:** 5.17.0  
+**Versão:** 5.18.0  
 **Autor:** Anthonny Lucas Santos da Silva  
 **Tipo:** aplicação web de portfólio com painel administrativo (CMS)  
 **Publicação prevista:** Netlify, com funções de servidor e Netlify Blobs  

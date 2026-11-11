@@ -383,7 +383,7 @@ export function setupCmsAdmin({request,showStatus}) {
       renderTechCategoryControls();renderTechCategoryManager();renderTechList();iconCatalog.render();
       alignTechColumns();
       const errors=results.map((r,i)=>r.status==='rejected'?['Conteúdo','Tecnologias','Categorias de tecnologias'][i]+': '+r.reason.message:null).filter(Boolean);
-      if(errors.length)showStatus('Falha no carregamento: '+errors.join(' | '),'error');
+      return errors;
     }
   };
 }
